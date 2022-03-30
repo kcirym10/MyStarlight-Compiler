@@ -1,4 +1,3 @@
-from sqlite3 import ProgrammingError
 from sly import Lexer
 import re
 
