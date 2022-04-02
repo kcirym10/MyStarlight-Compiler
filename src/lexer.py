@@ -28,7 +28,7 @@ class StartlightLexer(Lexer):
     # Constant char matching
     CTE_CHAR = r"'\w'"
     # Constant string matching
-    CTE_STRING = r'\".*?\"'  # Needs revision because matches everything
+    CTE_STRING = r'\".*?\"' 
 
     # Special class ID rule
     CLASS_ID = r'[A-Z]\w*'
