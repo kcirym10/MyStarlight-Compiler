@@ -35,7 +35,7 @@ class StartlightParser(Parser):
     def vars(self, p):
         pass
 
-    @_('v_types ids')
+    @_('v_types ids ";"')
     def start_var(self, p):
         pass
 
@@ -43,7 +43,7 @@ class StartlightParser(Parser):
     def v_types(self, p):
         pass
 
-    @_('ID opt_arr_def moreids ";" moretypes')
+    @_('ID opt_arr_def moreids moretypes')
     def ids(self, p):
         pass
 
@@ -180,8 +180,12 @@ class StartlightParser(Parser):
         pass
 
     # Call Func
-    @_('ID opt_class_func "(" opt_call_params ")" ";" ')
+    @_('call_func_body ";"')
     def call_func(self, p):
+        pass
+
+    @_('ID opt_class_func "(" opt_call_params ")" ')
+    def call_func_body(self, p):
         pass
 
     @_(' "." ID', 'eps')
@@ -255,7 +259,7 @@ class StartlightParser(Parser):
         pass
 
     # F
-    @_('"(" expression ")"', 'variable', 'call_func', 'var_cte')
+    @_('"(" expression ")"', 'variable', 'call_func_body', 'var_cte')
     def f(self, p):
         pass
 
