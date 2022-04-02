@@ -1,6 +1,6 @@
 program patito;
 
-var int i;
+var int i, j;
 
 class Vehicle{
             var
@@ -54,11 +54,34 @@ func float recursiveSumUntilZero(int x){
                 return(0);
             }
 
-            return (x.x);
+            return (x.x(x()));
+            return (x + recursiveSumUntilZero(x - 1));
+        }
+
+func void callWithNewSize(int x){
+            car1.setSize(x);
         }
 
 main()
-var int a;
+var 
+    int inputSize, inputCount;
 {
-    
+    print("Enter number of car sizes: ");
+    read(inputCount);
+    for (i = 0 to 9){
+        c[i] = 'c';
+    }
+
+    for (i = 0 to inputCount){
+        print("Size: ");
+        read(inputSize);
+        callWithNewSize(inputSize);
+        car2.setSize(inputSize);
+        print("Car 1 size ", car1.size, "Car 2 size ", car2.size);
+    }
+
+    j = 10;
+    while (j > 0){
+        print("Sum of ", j, " is ", recursiveSumUntilZero(j));
+    }
 }
