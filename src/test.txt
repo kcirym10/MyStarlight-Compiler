@@ -1,0 +1,5 @@
+program patito;
+
+main(){
+    print(a);
+}

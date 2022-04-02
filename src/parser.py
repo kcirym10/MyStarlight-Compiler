@@ -1,5 +1,6 @@
 from sly import Parser
 from lexer import StartlightLexer
+import os.path
 
 
 class StartlightParser(Parser):
@@ -7,11 +8,12 @@ class StartlightParser(Parser):
     # Import the set of tokens made by the Lexer
     # Required by the parser
     tokens = StartlightLexer.tokens
+    debugfile = 'parser.out'
 
     # Set of rules for sintaxis
 
     # Program
-    @_('PROGRAM ID ";" opt_vars opt_classes opt_funcs')
+    @_('PROGRAM ID ";" opt_vars opt_classes opt_funcs main')
     def program(self, p):
         print("Successfully compiled uwu")
         pass
@@ -70,10 +72,6 @@ class StartlightParser(Parser):
     def opt_derivation(self, p):
         pass
 
-    @_('vars', 'eps')
-    def opt_vars(self, p):
-        pass
-
     @_('methods', 'eps')
     def opt_methods(self, p):
         pass
@@ -119,13 +117,13 @@ class StartlightParser(Parser):
     def body(self, p):
         pass
 
-    @_('statements more_stmts', 'eps')
+    @_('statements opt_stmts', 'eps')
     def opt_stmts(self, p):
         pass
 
-    @_('opt_stmts', 'eps')
+    '''@_('opt_stmts', 'eps')
     def more_stmts(self, p):
-        pass
+        pass'''
 
     @_('RETURN "(" expression ")" ";"', 'eps')
     def opt_return(self, p):
@@ -158,8 +156,144 @@ class StartlightParser(Parser):
     @_('variable "=" expression ";"')
     def assign(self, p):
         pass
+
+    # Conditional
+    @_('IF "(" expression ")" "{" body "}" opt_else')
+    def conditional(self, p):
+        pass
+
+    @_('ELSE "{" body "}"', 'eps')
+    def opt_else(self, p):
+        pass
+
+    # Cycles
+    @_('for_loop', 'while_loop')
+    def cycles(self, p):
+        pass
+
+    @_('FOR "(" ID "=" expression TO expression ")" "{" body "}"')
+    def for_loop(self, p):
+        pass
+
+    @_('WHILE "(" expression ")" "{" body "}"')
+    def while_loop(self, p):
+        pass
+
+    # Call Func
+    @_('ID opt_class_func "(" opt_call_params ")" ";" ')
+    def call_func(self, p):
+        pass
+
+    @_(' "." ID', 'eps')
+    def opt_class_func(self, p):
+        pass
+
+    @_('expression more_expressions', 'eps')
+    def opt_call_params(self, p):
+        pass
+
+    @_('"," expression', 'eps')
+    def more_expressions(self, p):
+        pass
+
+    # Variable
+    @_('ID opt_class_func opt_arr_call')
+    def variable(self, p):
+        pass
+
+    @_(' "[" expression opt_dim_call "]"')
+    def opt_arr_call(self, p):
+        pass
+
+    @_(' "," expression', 'eps')
+    def opt_dim_call(self, p):
+        pass
+
+    # Expression (OR)
+    @_('t_exp exp_or')
+    def expression(self, p):
+        pass
+
+    @_('"|" expression', 'eps')
+    def exp_or(self, p):
+        pass
+
+    # T_EXP (AND)
+    @_('g_exp t_and')
+    def t_exp(self, p):
+        pass
+
+    @_('"&" t_exp', 'eps')
+    def t_and(self, p):
+        pass
+
+    # G_EXP
+    @_('m_exp g_exp_opers')
+    def g_exp(self, p):
+        pass
+
+    @_('"<" m_exp', '">" m_exp', 'GREATER_OR_EQUAL_TO m_exp', 'LESS_OR_EQUAL_TO m_exp', 'NOT_EQUAL_TO m_exp', 'EQUAL_TO m_exp', 'eps')
+    def g_exp_opers(self, p):
+        pass
+
+    # M_EXP (sum and rest)
+    @_('t m_opers')
+    def m_exp(self, p):
+        pass
+
+    @_('"+" t', '"-" t', 'eps')
+    def m_opers(self, p):
+        pass
+
+    # T (multuplication and division)
+    @_('f t_opers')
+    def t(self, p):
+        pass
+
+    @_('"*" f', '"/" f', 'eps')
+    def t_opers(self, p):
+        pass
+
+    # F
+    @_('"(" expression ")"', 'variable', 'call_func', 'var_cte')
+    def f(self, p):
+        pass
+
+    # Var_cte integer, float, char, string
+    @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR', 'CTE_STRING')
+    def var_cte(self, p):
+        pass
+
+    # Main
+    @_('MAIN "(" ")" opt_vars "{" body "}"')
+    def main(self, p):
+        pass
+
     # Epsilon, describes an empty production
 
     @_('')
     def eps(self, p):
         pass
+
+
+if __name__ == '__main__':
+    lexer = StartlightLexer()
+    parser = StartlightParser()
+    print("==PARSER SLY==\n")
+
+    try:
+
+        scriptpath = os.path.dirname(__file__)
+        filename = os.path.join(scriptpath, 'test.txt')
+        f = open(filename)
+        # print(f.read())
+
+        # f = open("test.txt", "r")  # inserta nombre de archivo
+        s = ""
+        for s1 in f:
+            s += s1
+
+        result = parser.parse(lexer.tokenize(s))
+        print(result)
+    except EOFError:
+        print("Error" + EOFError)
