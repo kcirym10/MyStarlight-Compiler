@@ -64,7 +64,7 @@ class StartlightParser(Parser):
         pass
 
     # Classes
-    @_('CLASS CLASS_ID opt_derivation "{" opt_vars opt_methods "}"')
+    @_('CLASS CLASS_ID opt_derivation "{" opt_vars opt_methods "}" classes', 'eps')
     def classes(self, p):
         pass
 
@@ -125,7 +125,7 @@ class StartlightParser(Parser):
     def more_stmts(self, p):
         pass'''
 
-    @_('RETURN "(" expression ")" ";"', 'eps')
+    @_('RETURN "(" expression ")" ";" opt_return', 'eps')
     def opt_return(self, p):
         pass
 
@@ -192,7 +192,7 @@ class StartlightParser(Parser):
     def opt_call_params(self, p):
         pass
 
-    @_('"," expression', 'eps')
+    @_('"," opt_call_params', 'eps')
     def more_expressions(self, p):
         pass
 
@@ -201,7 +201,7 @@ class StartlightParser(Parser):
     def variable(self, p):
         pass
 
-    @_(' "[" expression opt_dim_call "]"')
+    @_(' "[" expression opt_dim_call "]"', 'eps')
     def opt_arr_call(self, p):
         pass
 
@@ -241,7 +241,7 @@ class StartlightParser(Parser):
     def m_exp(self, p):
         pass
 
-    @_('"+" t', '"-" t', 'eps')
+    @_('"+" m_exp', '"-" m_exp', 'eps')
     def m_opers(self, p):
         pass
 
@@ -250,7 +250,7 @@ class StartlightParser(Parser):
     def t(self, p):
         pass
 
-    @_('"*" f', '"/" f', 'eps')
+    @_('"*" t', '"/" t', 'eps')
     def t_opers(self, p):
         pass
 

@@ -1,5 +1,64 @@
 program patito;
 
-main(){
-    print(a);
+var int i;
+
+class Vehicle{
+            var
+                int size;
+            methods:
+                func void setSize(int newSize){
+                    size = newSize;
+                }
+        }
+class Car derives Vehicle{}
+class Class1{
+    var
+        int i2;
+    methods:
+        func void f1(int x){
+            a=b;
+            read(a);
+            print(a);
+            if (a == b){
+                a = b;
+            }
+            else{
+                print("Sorry");
+            }
+            for (i = a - 10 to b){
+                print(a);
+            }
+            while (a < b){
+                print(b);
+            }
+            car.f1();
+            car2.f2(a, b);
+
+            a = car1.size;
+            a = (car.size + 10)-50/100+2;
+            return ((car.size + 10) - 100/50 * 2);
+            return (a);
+        }
+}
+
+class Class2 derives Class1{
+    
+}
+
+func float arithmetic(){
+            return ((car.size + 10) - 100/50 * 2);
+        }
+
+func float recursiveSumUntilZero(int x){
+            if (x == 0){
+                return(0);
+            }
+
+            return (x.x);
+        }
+
+main()
+var int a;
+{
+    
 }
