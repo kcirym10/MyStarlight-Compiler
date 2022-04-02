@@ -28,7 +28,7 @@ class StartlightLexer(Lexer):
     # Constant char matching
     CTE_CHAR = r"'\w'"
     # Constant string matching
-    CTE_STRING = r'"[\w: ]*"'  # Needs revision because matches everything
+    CTE_STRING = r'\".*?\"'  # Needs revision because matches everything
 
     # Special class ID rule
     CLASS_ID = r'[A-Z]\w*'
@@ -100,8 +100,61 @@ class StartlightLexer(Lexer):
 if __name__ == '__main__':
     # Sample input string containig all possible tokens
     data = '''
-        program nanya;
-       
+        program try;
+        var
+            int i, j;
+            char c[10];
+            Car car1, car2;
+        class Vehicle{
+            var
+                int size;
+            methods:
+                func void setSize(int newSize){
+                    size = newSize;
+                }
+        }
+
+        class Car derives Vehicle{}
+
+        func float arithmetic(){
+            return ((car.size + 10) - 100/50 * 2);
+        }
+
+        func float recursiveSumUntilZero(int x){
+            if (x == 0){
+                return 0;
+            }
+
+            return (x + recursiveSumUntilZero(x - 1));
+        }
+
+        func void callWithNewSize(int x){
+            car1.setSize(x);
+        }
+
+        main()
+        int inputSize, inputCount;
+        {
+            print("Enter number of car sizes: ");
+            read(inputCount);
+
+            for (i = 0 to 9){
+                c[i] = 'c'
+            }
+
+            for (i = 0 to inputCount){
+                print("Size: ");
+                read(inputSize);
+                callWithNewSize(inputSize);
+                car2.setSize(inputSize);
+                print("Car 1 size ", car1.size, "Car 2 size ", car2.size);
+            }
+
+            j = 10;
+            while (j > 0){
+                print("Sum of ", j, " is ", recursiveSumUntilZero(j));
+            }
+        }
     '''
 
     lexer = StartlightLexer()
