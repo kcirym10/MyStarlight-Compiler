@@ -113,7 +113,7 @@ class StartlightParser(Parser):
         pass
 
     # Body
-    @_('opt_stmts opt_return')
+    @_('opt_stmts')
     def body(self, p):
         pass
 
@@ -121,16 +121,8 @@ class StartlightParser(Parser):
     def opt_stmts(self, p):
         pass
 
-    '''@_('opt_stmts', 'eps')
-    def more_stmts(self, p):
-        pass'''
-
-    @_('RETURN "(" expression ")" ";" opt_return', 'eps')
-    def opt_return(self, p):
-        pass
-
     # Statements
-    @_('print', 'read', 'assign', 'conditional', 'cycles', 'call_func')
+    @_('print', 'read', 'assign', 'conditional', 'cycles', 'call_func', 'function_return')
     def statements(self, p):
         pass
 
@@ -198,6 +190,11 @@ class StartlightParser(Parser):
 
     @_('"," opt_call_params', 'eps')
     def more_expressions(self, p):
+        pass
+
+    # Return Statement
+    @_('RETURN "(" expression ")" ";"')
+    def function_return(self, p):
         pass
 
     # Variable
