@@ -31,36 +31,36 @@ class StartlightParser(Parser):
         pass
 
     # Vars
-    @_('VAR start_var')
+    @_('VAR var_type')
     def vars(self, p):
         pass
 
-    @_('v_types ids ";"')
-    def start_var(self, p):
+    @_('simple ";" more_var_types', 'compound ";" more_var_types')
+    def var_type(self, p):
         pass
 
-    @_('type', 'CLASS_ID')
-    def v_types(self, p):
+    @_('var_type', 'eps')
+    def more_var_types(self, p):
         pass
 
-    @_('ID opt_arr_def moreids moretypes')
-    def ids(self, p):
+    @_("type ID moreids")
+    def simple(self, p):
         pass
 
-    @_('"[" CTE_INT opt_dim_def "]"', 'eps')
-    def opt_arr_def(self, p):
-        pass
-
-    @_('"," CTE_INT', 'eps')
-    def opt_dim_def(self, p):
-        pass
-
-    @_('"," ids', 'eps')
+    @_('"," ID moreids', 'eps')
     def moreids(self, p):
         pass
 
-    @_('start_var', 'eps')
-    def moretypes(self, p):
+    @_('CLASS_ID ID moreids', 'type ID "[" CTE_INT two_dim "]" more_arr_ids')
+    def compound(self, p):
+        pass
+
+    @_('"," ID "[" CTE_INT two_dim "]" more_arr_ids', 'eps')
+    def more_arr_ids(self, p):
+        pass
+
+    @_('"," CTE_INT', 'eps')
+    def two_dim(self, p):
         pass
 
     # Classes
