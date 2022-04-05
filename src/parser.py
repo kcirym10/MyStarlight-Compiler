@@ -126,7 +126,7 @@ class StartlightParser(Parser):
     def statements(self, p):
         pass
 
-    # Print
+    # Print Statement
     @_('PRINT "(" p_args ")" ";"')
     def print(self, p):
         pass
@@ -139,17 +139,17 @@ class StartlightParser(Parser):
     def more_args(self, p):
         pass
 
-    # Read
+    # Read Statement
     @_('READ "(" variable ")" ";"')
     def read(self, p):
         pass
 
-    # Assign
+    # Assign Statement
     @_('variable "=" expression ";"')
     def assign(self, p):
         pass
 
-    # Conditional
+    # Conditional Statement
     @_('IF "(" expression ")" "{" body "}" opt_else')
     def conditional(self, p):
         pass
@@ -158,7 +158,7 @@ class StartlightParser(Parser):
     def opt_else(self, p):
         pass
 
-    # Cycles
+    # Cycles Statement
     @_('for_loop', 'while_loop')
     def cycles(self, p):
         pass
@@ -171,7 +171,7 @@ class StartlightParser(Parser):
     def while_loop(self, p):
         pass
 
-    # Call Func
+    # Call Func Statement
     @_('call_func_body ";"')
     def call_func(self, p):
         pass
