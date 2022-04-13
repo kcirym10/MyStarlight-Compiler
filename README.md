@@ -1,8 +1,11 @@
-<div align='center'>
-![MyStarlight Compiler](myStarlight.png)
+<div align="center">
+<img src="myStarlight.png" height="400"  width="600">
+  <br />
+  <br />
+<p>A Compiler for an Object-Oriented Language </p>
+  
 </div>
 
-A Compiler for an Object-Oriented Language 
 
 ---
 ### 🔍 Project Description
@@ -14,8 +17,17 @@ MyStarlight's documentation can be found [insert link here]
 
 ---
 ### 📖 Weekly Updates
-Week 0:
-Week 1:
+- Week 0:
+  - Regex for token matching
+  - Designed language syntax diagrams
+  - Created DNF rules based in syntax diagrams
+  - Started project development and github repository
+
+- Week 1:
+  - Received the approval of syntax diagrams and DNF rules
+  - Implemented Lexer with complete token matching
+  - Implemented Parser rules
+
 ---
 ### 🤖 Authors
 | Name     | Student ID |
