@@ -12,6 +12,10 @@ class symTableManager(List):
     def __init__(self):
         self.pushTable(symTable())
 
+    # Returns a new table to be used either as a new scope or a new variables table
+    def getNewSymTable(self):
+        return symTable()
+
     # Pushes a new Symbol Table to the top of the stack
     # this could be a new scope (such as a function) or a vars table
     def pushTable(self, table):
