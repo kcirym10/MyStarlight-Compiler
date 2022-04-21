@@ -19,7 +19,6 @@ class StartlightParser(Parser):
     @_('PROGRAM np_create_global_symTable ID np_program_record ";" opt_vars opt_classes opt_funcs main')
     def program(self, p):
         print("Successfully compiled uwu")
-        pass
     
     @_('')
     def np_create_global_symTable(self, p):
@@ -32,9 +31,8 @@ class StartlightParser(Parser):
     
     @_('')
     def np_program_record(self, p):
-        print("Program name")
         symMngr.insertRecord(p[-1], record.returnRecord())
-        print(symMngr)
+        record.clearCurrentRecord()
         
 
     @_('vars', 'eps')
@@ -50,9 +48,24 @@ class StartlightParser(Parser):
         pass
 
     # Vars
-    @_('VAR var_type')
+    @_('VAR np_create_var_table var_type')
     def vars(self, p):
         pass
+
+    @_('')
+    def np_create_var_table(self, p):
+        # 1 Check if current table already has a vars table
+        if 'VARS' not in symMngr[-1]:
+            record.setType("Var Table")
+            # TODO: Need parent ref
+            record.setChildRef(symMngr.getNewSymTable())
+            symMngr.insertRecord('VARS',record.returnRecord())
+            symMngr.pushTable(record.getChildRef())
+            record.clearCurrentRecord()
+        else:
+            # What to do when table already exists?
+            # Created at function parameters
+            print(":)")
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
     def var_type(self, p):
@@ -62,9 +75,16 @@ class StartlightParser(Parser):
     def more_var_types(self, p):
         pass
 
-    @_("type ID moreids")
+    @_("type ID np_save_id moreids")
     def simple(self, p):
         pass
+
+    # Sets current type to each record and inserts it in current vars table
+    @_('')
+    def np_save_id(self, p):
+        record.setType(symMngr.currentType) # TODO: implement getter for currentType
+        symMngr.insertRecord(p[-1], record.returnRecord())
+        print(symMngr[-1])
 
     @_('"," ID moreids', 'eps')
     def moreids(self, p):
@@ -129,7 +149,7 @@ class StartlightParser(Parser):
     # Type
     @_('INT', 'FLOAT', 'CHAR')
     def type(self, p):
-        pass
+        symMngr.setCurrentType(p[-1]) # sets the symMngr's current type
 
     # Body
     @_('opt_stmts')
