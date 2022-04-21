@@ -1,5 +1,8 @@
 from sly import Parser
 from lexer import StartlightLexer
+from record import Record
+from symTable import symTable
+from symTableManager import symTableManager
 import os.path
 
 
@@ -13,10 +16,26 @@ class StartlightParser(Parser):
     # Set of rules for sintaxis
 
     # Program
-    @_('PROGRAM ID ";" opt_vars opt_classes opt_funcs main')
+    @_('PROGRAM np_create_global_symTable ID np_program_record ";" opt_vars opt_classes opt_funcs main')
     def program(self, p):
         print("Successfully compiled uwu")
         pass
+    
+    @_('')
+    def np_create_global_symTable(self, p):
+        print("Program type")
+        global symMngr
+        symMngr = symTableManager()
+        global record 
+        record = Record()
+        record.setType("Program")
+    
+    @_('')
+    def np_program_record(self, p):
+        print("Program name")
+        symMngr.insertRecord(p[-1], record.returnRecord())
+        print(symMngr)
+        
 
     @_('vars', 'eps')
     def opt_vars(self, p):
