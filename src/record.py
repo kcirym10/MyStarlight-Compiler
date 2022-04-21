@@ -16,6 +16,12 @@ class Record:
     def setChildRef(self, childRef):
         self.currentRecord['childRef'] = childRef
 
+    def getParentRef(self):
+        return self.currentRecord['parentRef']
+
+    def getChildRef(self):
+        return self.currentRecord['childRef']
+
     def clearCurrentRecord(self):
         self.currentRecord = {'type': None,
                               'parentRef': None, 'childRef': None}
