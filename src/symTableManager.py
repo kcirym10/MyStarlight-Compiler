@@ -12,9 +12,13 @@ class symTableManager(List):
     def __init__(self):
         self.pushTable(symTable())
 
+    # Pushes a new Symbol Table to the top of the stack
+    # this could be a new scope (such as a function) or a vars table
     def pushTable(self, table):
         self.append(table)
 
+    # Inserts a new record into the currently active table at the top
+    # of the manager's stack
     def insertRecord(self, key, value):
         self[-1].saveRecord(key, value)
 
