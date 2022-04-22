@@ -1,14 +1,19 @@
 # Class that manages the dictionaries format
+from enum import Enum
+
+class programTypes(str, Enum):
+    PROGRAM = "PROGRAM"
+    CLASS = "CLASS"
+    MAIN = "MAIN"
 
 class Record:
-
     def __init__(self):
         # has the current parameters of the record
         self.currentRecord = {'type': None,
                               'parentRef': None, 'childRef': None}
 
     def setType(self, type):
-        self.currentRecord['type'] = str(type)
+        self.currentRecord['type'] = type
 
     def setParentRef(self, parentRef):
         self.currentRecord['parentRef'] = parentRef
@@ -28,6 +33,16 @@ class Record:
 
     def returnRecord(self):
         return self.currentRecord
+
+    # ProgramTypes getters
+    def getProgramType(self):
+        return programTypes.PROGRAM.value
+
+    def getClassType(self):
+        return programTypes.CLASS.value
+
+    def getMainType(self):
+        return programTypes.MAIN.value
 
 
 if __name__ == '__main__':
