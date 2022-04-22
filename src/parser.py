@@ -48,7 +48,7 @@ class StartlightParser(Parser):
         pass
 
     # Vars
-    @_('VAR np_create_var_table var_type')
+    @_('VAR np_create_var_table var_type np_exit_var_scope')
     def vars(self, p):
         pass
 
@@ -66,6 +66,12 @@ class StartlightParser(Parser):
             # What to do when table already exists?
             # Created at function parameters
             print(":)")
+    
+    @_('')
+    def np_exit_var_scope(self, p):
+        print(symMngr[-1])
+        symMngr.pop()
+        print(symMngr[-1])
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
     def var_type(self, p):
@@ -85,7 +91,6 @@ class StartlightParser(Parser):
         record.setType(symMngr.currentType) # TODO: implement getter for currentType
         symMngr.insertRecord(p[-1], record.returnRecord())
         record.clearCurrentRecord()
-        print(symMngr[-1])
 
     @_('"," ID np_save_id moreids', 'eps')
     def moreids(self, p):
