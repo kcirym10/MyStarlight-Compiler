@@ -18,6 +18,10 @@ class symTableManager(List):
     def setCurrentType(self, type):
         self.currentType = type
 
+    # Returns the current type
+    def getCurrentType(self):
+        return self.currentType
+
     # Returns a new table to be used either as a new scope or a new variables table
     def getNewSymTable(self):
         newSymTable = symTable(self[-1])
