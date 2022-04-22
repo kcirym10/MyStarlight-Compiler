@@ -23,8 +23,8 @@ class symTableManager(List):
         return self.currentType
 
     # Returns a new table to be used either as a new scope or a new variables table
-    def getNewSymTable(self):
-        newSymTable = symTable(self[-1])
+    def getNewSymTable(self, is_varTable = False):
+        newSymTable = symTable(self[-1], is_varTable)
         return newSymTable
 
     # Pushes a new Symbol Table to the top of the stack
