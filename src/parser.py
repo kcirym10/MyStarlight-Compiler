@@ -55,10 +55,10 @@ class StartlightParser(Parser):
     @_('')
     def np_create_var_table(self, p):
         # 1 Check if current table already has a vars table
-        if 'VARS' not in symMngr[-1]:
+        if symMngr[-1].is_varTable == False:
             record.setType("Var Table")
             # TODO: Need parent ref
-            record.setChildRef(symMngr.getNewSymTable())
+            record.setChildRef(symMngr.getNewSymTable(True))
             symMngr.insertRecord('VARS',record.returnRecord())
             symMngr.pushTable(record.getChildRef())
             record.clearCurrentRecord()
@@ -88,7 +88,7 @@ class StartlightParser(Parser):
     # Sets current type to each record and inserts it in current vars table
     @_('')
     def np_save_id(self, p):
-        record.setType(symMngr.currentType) # TODO: implement getter for currentType
+        record.setType(symMngr.getCurrentType()) # TODO: implement getter for currentType
         symMngr.insertRecord(p[-1], record.returnRecord())
         record.clearCurrentRecord()
 
@@ -136,13 +136,23 @@ class StartlightParser(Parser):
     def functions(self, p):
         pass
 
-    @_('FUNC func_types ID "(" opt_param ")" opt_vars "{" body "}" functions')
+    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" functions')
     def function(self, p):
         pass
 
+    @_('')
+    def np_save_func_id(self, p):
+        record.setType(symMngr.getCurrentType())
+        record.setChildRef(symMngr.getNewSymTable())
+        symMngr.insertRecord(p[-1], record.returnRecord())
+        symMngr.pushTable(record.getChildRef())
+        record.clearCurrentRecord()
+
+    # Set current type in symMngr to void
     @_('type', 'VOID')
     def func_types(self, p):
-        pass
+        if (p[-1] == "void"):
+            symMngr.setCurrentType(p[-1])
 
     @_('param moreparams', 'eps')
     def opt_param(self, p):
