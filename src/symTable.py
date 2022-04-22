@@ -8,9 +8,10 @@ from typing import Dict
 '''
 class symTable(Dict):
     scopeLevel = 0 # Class attribute might change
-    varTable_isActive = False
-    def __init__(self):
+    def __init__(self, parentRef = None, is_varTable = False):
         print("New Symbol Table") 
+        self.parentRef = parentRef # Allows for searches into the parent tree
+        self.is_varTable = is_varTable
 
     def keyNotExists(self, key):
         if key not in self:
@@ -24,7 +25,7 @@ class symTable(Dict):
             self[key] = value
         else:
             # Temporary print, should store in error handler to be reported
-            print(f"key: \"{key}\" already exists in table")
+            print(f"Multiple declaration of key: \"{key}\"")
 
     # Search function for the parent tree
 

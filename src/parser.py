@@ -19,7 +19,6 @@ class StartlightParser(Parser):
     @_('PROGRAM np_create_global_symTable ID np_program_record ";" opt_vars opt_classes opt_funcs main')
     def program(self, p):
         print("Successfully compiled uwu")
-        pass
     
     @_('')
     def np_create_global_symTable(self, p):
@@ -32,9 +31,8 @@ class StartlightParser(Parser):
     
     @_('')
     def np_program_record(self, p):
-        print("Program name")
         symMngr.insertRecord(p[-1], record.returnRecord())
-        print(symMngr)
+        record.clearCurrentRecord()
         
 
     @_('vars', 'eps')
@@ -50,9 +48,29 @@ class StartlightParser(Parser):
         pass
 
     # Vars
-    @_('VAR var_type')
+    @_('VAR np_create_var_table var_type np_exit_scope')
     def vars(self, p):
         pass
+
+    @_('')
+    def np_create_var_table(self, p):
+        # 1 Check if current table already has a vars table
+        if symMngr[-1].is_varTable == False:
+            record.setType("Var Table")
+            # TODO: Need parent ref
+            record.setChildRef(symMngr.getNewSymTable(True))
+            symMngr.insertRecord('VARS',record.returnRecord())
+            symMngr.pushTable(record.getChildRef())
+            record.clearCurrentRecord()
+        else:
+            # What to do when table already exists?
+            # Created at function parameters
+            print(":)")
+    
+    @_('')
+    def np_exit_scope(self, p):
+        symMngr.pop()
+        print(symMngr)
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
     def var_type(self, p):
@@ -62,19 +80,31 @@ class StartlightParser(Parser):
     def more_var_types(self, p):
         pass
 
-    @_("type ID moreids")
+    @_("type ID np_save_id moreids")
     def simple(self, p):
         pass
 
-    @_('"," ID moreids', 'eps')
+    # Sets current type to each record and inserts it in current vars table
+    @_('')
+    def np_save_id(self, p):
+        record.setType(symMngr.getCurrentType()) # TODO: implement getter for currentType
+        symMngr.insertRecord(p[-1], record.returnRecord())
+        record.clearCurrentRecord()
+
+    @_('"," ID np_save_id moreids', 'eps')
     def moreids(self, p):
         pass
 
-    @_('CLASS_ID ID moreids', 'type ID "[" CTE_INT two_dim "]" more_arr_ids')
+    @_('CLASS_ID np_class_id ID np_save_id moreids', 'type ID "[" CTE_INT two_dim "]" more_arr_ids')
     def compound(self, p):
         pass
 
-    @_('"," ID "[" CTE_INT two_dim "]" more_arr_ids', 'eps')
+    @_('')
+    def np_class_id(self, p):
+        # TODO Check if class_id defined in semantic cube
+        symMngr.setCurrentType(p[-1])
+
+    @_('"," ID np_save_id "[" CTE_INT two_dim "]" more_arr_ids', 'eps')
     def more_arr_ids(self, p):
         pass
 
@@ -105,13 +135,23 @@ class StartlightParser(Parser):
     def functions(self, p):
         pass
 
-    @_('FUNC func_types ID "(" opt_param ")" opt_vars "{" body "}" functions')
+    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" np_exit_scope functions')
     def function(self, p):
         pass
 
+    @_('')
+    def np_save_func_id(self, p):
+        record.setType(symMngr.getCurrentType())
+        record.setChildRef(symMngr.getNewSymTable())
+        symMngr.insertRecord(p[-1], record.returnRecord())
+        symMngr.pushTable(record.getChildRef())
+        record.clearCurrentRecord()
+
+    # Set current type in symMngr to void
     @_('type', 'VOID')
     def func_types(self, p):
-        pass
+        if (p[-1] == "void"):
+            symMngr.setCurrentType(p[-1])
 
     @_('param moreparams', 'eps')
     def opt_param(self, p):
@@ -122,14 +162,14 @@ class StartlightParser(Parser):
         pass
 
     # Param
-    @_('type ID')
+    @_('type ID np_save_id')
     def param(self, p):
         pass
 
     # Type
     @_('INT', 'FLOAT', 'CHAR')
     def type(self, p):
-        pass
+        symMngr.setCurrentType(p[-1]) # sets the symMngr's current type
 
     # Body
     @_('opt_stmts')
