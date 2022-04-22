@@ -25,7 +25,7 @@ class symTable(Dict):
             self[key] = value
         else:
             # Temporary print, should store in error handler to be reported
-            print(f"key: \"{key}\" already exists in table")
+            print(f"Multiple declaration of key: \"{key}\"")
 
     # Search function for the parent tree
 
