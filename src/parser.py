@@ -84,17 +84,23 @@ class StartlightParser(Parser):
     def np_save_id(self, p):
         record.setType(symMngr.currentType) # TODO: implement getter for currentType
         symMngr.insertRecord(p[-1], record.returnRecord())
+        record.clearCurrentRecord()
         print(symMngr[-1])
 
-    @_('"," ID moreids', 'eps')
+    @_('"," ID np_save_id moreids', 'eps')
     def moreids(self, p):
         pass
 
-    @_('CLASS_ID ID moreids', 'type ID "[" CTE_INT two_dim "]" more_arr_ids')
+    @_('CLASS_ID np_class_id ID np_save_id moreids', 'type ID "[" CTE_INT two_dim "]" more_arr_ids')
     def compound(self, p):
         pass
 
-    @_('"," ID "[" CTE_INT two_dim "]" more_arr_ids', 'eps')
+    @_('')
+    def np_class_id(self, p):
+        # TODO Check if class_id defined in semantic cube
+        symMngr.setCurrentType(p[-1])
+
+    @_('"," ID np_save_id "[" CTE_INT two_dim "]" more_arr_ids', 'eps')
     def more_arr_ids(self, p):
         pass
 
