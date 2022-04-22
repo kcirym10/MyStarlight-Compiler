@@ -27,7 +27,7 @@ class StartlightParser(Parser):
         symMngr = symTableManager()
         global record 
         record = Record()
-        record.setType("Program")
+        record.setType(record.getProgramType())
     
     @_('')
     def np_program_record(self, p):
@@ -70,7 +70,7 @@ class StartlightParser(Parser):
     @_('')
     def np_exit_scope(self, p):
         symMngr.pop()
-        print(symMngr)
+        #print(symMngr)
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
     def var_type(self, p):
@@ -113,9 +113,13 @@ class StartlightParser(Parser):
         pass
 
     # Classes
-    @_('CLASS CLASS_ID opt_derivation "{" opt_vars opt_methods "}" classes', 'eps')
+    @_('CLASS np_prepare_class CLASS_ID opt_derivation "{" opt_vars opt_methods "}" classes', 'eps')
     def classes(self, p):
         pass
+
+    @_('')
+    def np_prepare_class(self, p):
+        symMngr.setCurrentType(record.getClassType())
 
     @_('DERIVES CLASS_ID', 'eps')
     def opt_derivation(self, p):
@@ -325,9 +329,19 @@ class StartlightParser(Parser):
         pass
 
     # Main
-    @_('MAIN "(" ")" opt_vars "{" body "}"')
+    @_('MAIN np_save_main_id "(" ")" opt_vars "{" body "}"')
     def main(self, p):
         pass
+
+    @_('')
+    def np_save_main_id(self, p):
+        record.setType(record.getMainType())
+        print(record.currentRecord["type"], "\n\n")
+        record.setChildRef(symMngr.getNewSymTable())
+        symMngr.insertRecord(p[-1], record.returnRecord())
+        symMngr.pushTable(record.getChildRef())
+        record.clearCurrentRecord()
+        #print(symMngr)
 
     # Epsilon, describes an empty production
 
@@ -355,5 +369,6 @@ if __name__ == '__main__':
 
         result = parser.parse(lexer.tokenize(s))
         print(result)
+        print(symMngr)
     except EOFError:
         print("Error" + EOFError)
