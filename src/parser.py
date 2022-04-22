@@ -48,7 +48,7 @@ class StartlightParser(Parser):
         pass
 
     # Vars
-    @_('VAR np_create_var_table var_type np_exit_var_scope')
+    @_('VAR np_create_var_table var_type np_exit_scope')
     def vars(self, p):
         pass
 
@@ -68,10 +68,9 @@ class StartlightParser(Parser):
             print(":)")
     
     @_('')
-    def np_exit_var_scope(self, p):
-        print(symMngr[-1])
+    def np_exit_scope(self, p):
         symMngr.pop()
-        print(symMngr[-1])
+        print(symMngr)
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
     def var_type(self, p):
@@ -136,7 +135,7 @@ class StartlightParser(Parser):
     def functions(self, p):
         pass
 
-    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" functions')
+    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" np_exit_scope functions')
     def function(self, p):
         pass
 
@@ -163,7 +162,7 @@ class StartlightParser(Parser):
         pass
 
     # Param
-    @_('type ID')
+    @_('type ID np_save_id')
     def param(self, p):
         pass
 
