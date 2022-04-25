@@ -31,7 +31,7 @@ MyStarlight's documentation can be found [insert link here]
 - Week 3:
   - Implemented the neural points
   - Created the semantic cube
-  - Created VARS table and Functions directory
+  - Created VARS table and functions directory
   
 ---
 ### 🤖 Authors
