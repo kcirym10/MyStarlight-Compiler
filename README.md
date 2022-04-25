@@ -27,10 +27,15 @@ MyStarlight's documentation can be found [insert link here]
   - Received the approval of syntax diagrams and DNF rules
   - Implemented Lexer with complete token matching
   - Implemented Parser rules
-
+  
+- Week 3:
+  - Implemented the neural points
+  - Created the semantic cube
+  - Created VARS table and Functions directory
+  
 ---
 ### 🤖 Authors
-| Name     | Student ID |
-| ---      | ---       |
+| Name                   | Student ID |
+| ---------------------- | ---------- |
 | Tanya Yaretzi González | A00823408  |
-| José Alejandro Myrick | A00819666   |
+| José Alejandro Myrick  | A00819666  |
