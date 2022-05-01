@@ -23,11 +23,13 @@ class StartlightParser(Parser):
     
     @_('')
     def np_create_global_symTable(self, p):
-        print("Program type")
+        #print("Program type")
         global symMngr
         symMngr = symTableManager()
         global record 
         record = Record()
+        global quads
+        quads = Quadruples()
         record.setType(record.getProgramType())
     
     @_('')
@@ -322,7 +324,7 @@ class StartlightParser(Parser):
     
     @_('')
     def np_push_operator(self, p):
-        Quadruples.createIfTopIs(p[-1])
+        quads.createIfTopIs(p[-1])
     # F
     @_('"(" expression ")"', 'variable', 'call_func_body', 'var_cte')
     def f(self, p):
@@ -341,12 +343,11 @@ class StartlightParser(Parser):
     @_('')
     def np_save_main_id(self, p):
         record.setType(record.getMainType())
-        print(record.currentRecord["type"], "\n\n")
+        #print(record.currentRecord["type"], "\n\n")
         record.setChildRef(symMngr.getNewSymTable())
         symMngr.insertRecord(p[-1], record.returnRecord())
         symMngr.pushTable(record.getChildRef())
         record.clearCurrentRecord()
-        #print(symMngr)
 
     # Epsilon, describes an empty production
 
@@ -373,7 +374,7 @@ if __name__ == '__main__':
             s += s1
 
         result = parser.parse(lexer.tokenize(s))
-        print(result)
-        print(symMngr)
+        #print(result)
+        #print(symMngr)
     except EOFError:
         print("Error" + EOFError)
