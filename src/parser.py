@@ -90,12 +90,13 @@ class StartlightParser(Parser):
     # Sets current type to each record and inserts it in current vars table
     @_('')
     def np_save_id(self, p):
-        if symMngr.isVarKeyDeclared:
-            record.setType(symMngr.getCurrentType())
-            symMngr.insertVarRecord(p[-1], record.returnRecord())
-            record.clearCurrentRecord()
-        else:
-            print(f"Multiple declaration of key: \"{p[-1]}\"")
+        if symMngr.canPushOrPop:
+            if symMngr.isVarKeyDeclared(p[-1]):
+                record.setType(symMngr.getCurrentType())
+                symMngr.insertVarRecord(p[-1], record.returnRecord())
+                record.clearCurrentRecord()
+            else:
+                print(f"Multiple declaration of key: \"{p[-1]}\"")
 
     @_('"," ID np_save_id moreids', 'eps')
     def moreids(self, p):
