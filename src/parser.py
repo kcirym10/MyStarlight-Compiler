@@ -21,6 +21,7 @@ class StartlightParser(Parser):
     def program(self, p):
         print("Successfully compiled uwu")
     
+    # Initializes all global variables
     @_('')
     def np_create_global_symTable(self, p):
         #print("Program type")
@@ -51,19 +52,18 @@ class StartlightParser(Parser):
         pass
 
     # Vars
-    @_('VAR np_create_var_table var_type np_exit_scope')
+    @_('VAR np_create_var_table var_type')
     def vars(self, p):
         pass
 
     @_('')
     def np_create_var_table(self, p):
         # 1 Check if current table already has a vars table
-        if symMngr[-1].is_varTable == False:
+        if not symMngr[-1].hasVarTable():
             record.setType("Var Table")
             # TODO: Need parent ref
-            record.setChildRef(symMngr.getNewSymTable(True))
+            record.setChildRef(symMngr.getNewSymTable())
             symMngr.insertRecord('VARS',record.returnRecord())
-            symMngr.pushTable(record.getChildRef())
             record.clearCurrentRecord()
         else:
             # What to do when table already exists?
@@ -72,7 +72,7 @@ class StartlightParser(Parser):
     
     @_('')
     def np_exit_scope(self, p):
-        symMngr.pop()
+        symMngr.popRecord()
         #print(symMngr)
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
@@ -90,9 +90,12 @@ class StartlightParser(Parser):
     # Sets current type to each record and inserts it in current vars table
     @_('')
     def np_save_id(self, p):
-        record.setType(symMngr.getCurrentType()) # TODO: implement getter for currentType
-        symMngr.insertRecord(p[-1], record.returnRecord())
-        record.clearCurrentRecord()
+        if symMngr.isVarKeyDeclared:
+            record.setType(symMngr.getCurrentType())
+            symMngr.insertVarRecord(p[-1], record.returnRecord())
+            record.clearCurrentRecord()
+        else:
+            print(f"Multiple declaration of key: \"{p[-1]}\"")
 
     @_('"," ID np_save_id moreids', 'eps')
     def moreids(self, p):
@@ -148,11 +151,15 @@ class StartlightParser(Parser):
 
     @_('')
     def np_save_func_id(self, p):
-        record.setType(symMngr.getCurrentType())
-        record.setChildRef(symMngr.getNewSymTable())
-        symMngr.insertRecord(p[-1], record.returnRecord())
-        symMngr.pushTable(record.getChildRef())
-        record.clearCurrentRecord()
+        if symMngr.isKeyDeclared(p[-1]):
+            record.setType(symMngr.getCurrentType())
+            record.setChildRef(symMngr.getNewSymTable())
+            symMngr.insertRecord(p[-1], record.returnRecord())
+            symMngr.pushTable(record.getChildRef())
+            record.clearCurrentRecord()
+        else:
+            symMngr.canPushOrPop = False
+            print(f"Multiple declaration of key: \"{p[-1]}\"")
 
     # Set current type in symMngr to void
     @_('type', 'VOID')

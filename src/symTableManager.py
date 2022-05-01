@@ -10,6 +10,7 @@ from symTable import symTable
 
 class symTableManager(List):
     currentType = None
+    canPushOrPop = True # Manages duplicate scopes
 
     def __init__(self):
         self.pushTable(symTable())
@@ -23,19 +24,40 @@ class symTableManager(List):
         return self.currentType
 
     # Returns a new table to be used either as a new scope or a new variables table
-    def getNewSymTable(self, is_varTable = False):
-        newSymTable = symTable(self[-1], is_varTable)
+    def getNewSymTable(self):
+        newSymTable = symTable(self[-1])
         return newSymTable
 
+    # Checks if variable is declared
+    def isVarKeyDeclared(self, key):
+        if self[-1].varKeyNotExists(key):
+            return True
+        return False
+
+    # Checks if ID is declared
+    def isKeyDeclared(self, key):
+        if self[-1].keyNotExists(key):
+            return True
+        return False
     # Pushes a new Symbol Table to the top of the stack
-    # this could be a new scope (such as a function) or a vars table
+    # this could be a new scope (such as a function)
     def pushTable(self, table):
-        self.append(table)
+        if self.canPushOrPop:
+            self.append(table)
 
     # Inserts a new record into the currently active table at the top
     # of the manager's stack
     def insertRecord(self, key, value):
         self[-1].saveRecord(key, value)
+    
+    def insertVarRecord(self, key, value):
+        self[-1].saveVarRecord(key, value)
+
+    def popRecord(self):
+        if self.canPushOrPop:
+            self.pop()
+        else:
+            self.canPushOrPop = True
 
 if __name__ == "__main__":
     symMngr = symTableManager()

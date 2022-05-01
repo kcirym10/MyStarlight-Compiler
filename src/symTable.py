@@ -11,10 +11,20 @@ class symTable(Dict):
     def __init__(self, parentRef = None, is_varTable = False):
         print("New Symbol Table") 
         self.parentRef = parentRef # Allows for searches into the parent tree
-        self.is_varTable = is_varTable
+    
+    def hasVarTable(self):
+        if 'VARS' in self:
+            return True
+        
+        return False
 
     def keyNotExists(self, key):
         if key not in self:
+            return True
+        return False
+
+    def varKeyNotExists(self, key):
+        if key not in self['VARS']['childRef']:
             return True
         return False
         
@@ -23,12 +33,41 @@ class symTable(Dict):
         # Must first if key doesn't exist in current table
         if self.keyNotExists(key):
             self[key] = value
+
+    def saveVarRecord(self, key, value):
+        if self.varKeyNotExists(key):
+            self['VARS']['childRef'][key] = value
+            return True
         else:
-            # Temporary print, should store in error handler to be reported
-            print(f"Multiple declaration of key: \"{key}\"")
+            print(f"Multiple declaration of var key: \"{key}\"")
+            return False
 
-    # Search function for the parent tree
+    '''# Search function for the parent tree
+    def searchKey(self, key):
+        if self.getTableType(): # If table is a Vars Table
+            if self.keyNotExists:
+                return self.searchParentTree(self.parentRef, key)
+            print(self[key])
+            return self[key]
 
+    def searchForVar(self, table, key):
+        if 'VARS' in table:
+            if key in table['VARS']['childRef']:
+                print('KEY FOUND!',table['VARS']['childRef'][key])
+                return table['VARS']['childRef'][key]
+
+        return None
+
+    def searchParentTree(self, table, key):
+        if table is not None:
+            record = self.searchForVar(table, key)
+            if record is not None:
+                 return record
+            print(self)
+
+            return self.searchParentTree(table.parentRef, key)
+            
+        return None # Did not find key'''
 
 if __name__ == "__main__":
     sym = symTable()
