@@ -324,7 +324,7 @@ class StartlightParser(Parser):
         pass
 
     # Var_cte integer, float, char, string
-    @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR', 'CTE_STRING')
+    @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR')
     def var_cte(self, p):
         pass
 
