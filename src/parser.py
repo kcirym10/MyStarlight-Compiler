@@ -1,5 +1,6 @@
 from sly import Parser
 from lexer import StartlightLexer
+from quadruples import Quadruples
 from record import Record
 from symTable import symTable
 from symTableManager import symTableManager
@@ -278,7 +279,7 @@ class StartlightParser(Parser):
     def expression(self, p):
         pass
 
-    @_('"|" expression', 'eps')
+    @_('"|" np_push_operator expression', 'eps')
     def exp_or(self, p):
         pass
 
@@ -287,7 +288,7 @@ class StartlightParser(Parser):
     def t_exp(self, p):
         pass
 
-    @_('"&" t_exp', 'eps')
+    @_('"&" np_push_operator t_exp', 'eps')
     def t_and(self, p):
         pass
 
@@ -296,7 +297,8 @@ class StartlightParser(Parser):
     def g_exp(self, p):
         pass
 
-    @_('"<" m_exp', '">" m_exp', 'GREATER_OR_EQUAL_TO m_exp', 'LESS_OR_EQUAL_TO m_exp', 'NOT_EQUAL_TO m_exp', 'EQUAL_TO m_exp', 'eps')
+    @_('"<" np_push_operator m_exp', '">" np_push_operator m_exp', 'GREATER_OR_EQUAL_TO np_push_operator m_exp', 
+        'LESS_OR_EQUAL_TO np_push_operator m_exp', 'NOT_EQUAL_TO np_push_operator m_exp', 'EQUAL_TO np_push_operator m_exp', 'eps')
     def g_exp_opers(self, p):
         pass
 
@@ -305,7 +307,7 @@ class StartlightParser(Parser):
     def m_exp(self, p):
         pass
 
-    @_('"+" m_exp', '"-" m_exp', 'eps')
+    @_('"+" np_push_operator m_exp', '"-" np_push_operator m_exp', 'eps')
     def m_opers(self, p):
         pass
 
@@ -314,17 +316,20 @@ class StartlightParser(Parser):
     def t(self, p):
         pass
 
-    @_('"*" t', '"/" t', 'eps')
+    @_('"*" np_push_operator t', '"/" np_push_operator t', 'eps')
     def t_opers(self, p):
         pass
-
+    
+    @_('')
+    def np_push_operator(self, p):
+        Quadruples.createIfTopIs(p[-1])
     # F
     @_('"(" expression ")"', 'variable', 'call_func_body', 'var_cte')
     def f(self, p):
         pass
 
     # Var_cte integer, float, char, string
-    @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR')
+    @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR', 'CTE_STRING')
     def var_cte(self, p):
         pass
 
