@@ -281,50 +281,71 @@ class StartlightParser(Parser):
     def expression(self, p):
         pass
 
-    @_('"|" np_push_operator expression', 'eps')
+    @_('"|" np_push_or_operator expression', 'eps')
     def exp_or(self, p):
         pass
+    
+    # Passes tuple of or operators to compare
+    @_('')
+    def np_push_or_operator(self, p):
+        quads.createIfTopIs(("|"))
 
     # T_EXP (AND)
     @_('g_exp t_and')
     def t_exp(self, p):
         pass
 
-    @_('"&" np_push_operator t_exp', 'eps')
+    @_('"&" np_push_and_operator t_exp', 'eps')
     def t_and(self, p):
         pass
+
+    # Passes tuple of and operators to compare
+    @_('')
+    def np_push_and_operator(self, p):
+        quads.createIfTopIs(("&"))
 
     # G_EXP
     @_('m_exp g_exp_opers')
     def g_exp(self, p):
         pass
 
-    @_('"<" np_push_operator m_exp', '">" np_push_operator m_exp', 'GREATER_OR_EQUAL_TO np_push_operator m_exp', 
-        'LESS_OR_EQUAL_TO np_push_operator m_exp', 'NOT_EQUAL_TO np_push_operator m_exp', 'EQUAL_TO np_push_operator m_exp', 'eps')
+    @_('"<" np_push_g_operator m_exp', '">" np_push_g_operator m_exp', 'GREATER_OR_EQUAL_TO np_push_g_operator m_exp', 
+        'LESS_OR_EQUAL_TO np_push_g_operator m_exp', 'NOT_EQUAL_TO np_push_g_operator m_exp', 'EQUAL_TO np_push_g_operator m_exp', 'eps')
     def g_exp_opers(self, p):
         pass
+
+    # Passes tuple of g operators to compare
+    @_('')
+    def np_push_g_operator(self, p):
+        quads.createIfTopIs(("<", ">", ">=", "<=", "!=", "=="))
 
     # M_EXP (sum and rest)
     @_('t m_opers')
     def m_exp(self, p):
         pass
 
-    @_('"+" np_push_operator m_exp', '"-" np_push_operator m_exp', 'eps')
+    @_('"+" np_push_m_operator m_exp', '"-" np_push_m_operator m_exp', 'eps')
     def m_opers(self, p):
         pass
+    
+    # Passes tuple of m operators to compare
+    @_('')
+    def np_push_m_operator(self, p):
+        quads.createIfTopIs(("+", "-"))
 
     # T (multuplication and division)
     @_('f t_opers')
     def t(self, p):
         pass
 
-    @_('"*" np_push_operator t', '"/" np_push_operator t', 'eps')
+    @_('"*" np_t_push_operator t', '"/" np_t_push_operator t', 'eps')
     def t_opers(self, p):
         pass
     
+    # Passes tuple of t operators to compare
     @_('')
-    def np_push_operator(self, p):
-        quads.createIfTopIs(p[-1])
+    def np_t_push_operator(self, p):
+        quads.createIfTopIs(('*', '/'))
     # F
     @_('"(" expression ")"', 'variable', 'call_func_body', 'var_cte')
     def f(self, p):
@@ -375,6 +396,7 @@ if __name__ == '__main__':
 
         result = parser.parse(lexer.tokenize(s))
         #print(result)
-        #print(symMngr)
+        print(symMngr)
+        print(quads.pOperators) # TODO: Fix Var Table and Sym Table
     except EOFError:
         print("Error" + EOFError)
