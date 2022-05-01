@@ -9,27 +9,19 @@ class programTypes(str, Enum):
 class Record:
     def __init__(self):
         # has the current parameters of the record
-        self.currentRecord = {'type': None,
-                              'parentRef': None, 'childRef': None}
+        self.currentRecord = {'type': None, 'childRef': None}
 
     def setType(self, type):
         self.currentRecord['type'] = type
 
-    def setParentRef(self, parentRef):
-        self.currentRecord['parentRef'] = parentRef
-
     def setChildRef(self, childRef):
         self.currentRecord['childRef'] = childRef
-
-    def getParentRef(self):
-        return self.currentRecord['parentRef']
 
     def getChildRef(self):
         return self.currentRecord['childRef']
 
     def clearCurrentRecord(self):
-        self.currentRecord = {'type': None,
-                              'parentRef': None, 'childRef': None}
+        self.currentRecord = {'type': None, 'childRef': None}
 
     def returnRecord(self):
         return self.currentRecord
