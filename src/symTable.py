@@ -22,11 +22,17 @@ class symTable(Dict):
         if key not in self:
             return True
         return False
+    
+    def getFuncRecord(self, key):
+        return self[key]
 
     def varKeyNotExists(self, key):
         if key not in self['VARS']['childRef']:
             return True
         return False
+
+    def getVarRecord(self, key):
+        return self['VARS']['childRef'][key]
         
     # Generic for both functions (scopes) and variables
     def saveRecord(self, key, value):
@@ -42,32 +48,23 @@ class symTable(Dict):
             print(f"Multiple declaration of var key: \"{key}\"")
             return False
 
-    '''# Search function for the parent tree
+    # Search function for the parent tree
     def searchKey(self, key):
-        if self.getTableType(): # If table is a Vars Table
-            if self.keyNotExists:
-                return self.searchParentTree(self.parentRef, key)
-            print(self[key])
-            return self[key]
-
-    def searchForVar(self, table, key):
-        if 'VARS' in table:
-            if key in table['VARS']['childRef']:
-                print('KEY FOUND!',table['VARS']['childRef'][key])
-                return table['VARS']['childRef'][key]
-
+        return self.search(key, self)
+    
+    def search(self, key, table):
+        if table: 
+            if table.keyNotExists(key):
+                if table.varKeyNotExists(key):
+                    return self.search(key, table.parentRef)
+                else:
+                    return table.getVarRecord(key)
+            else:
+                return table.getFuncRecord(key)
         return None
 
-    def searchParentTree(self, table, key):
-        if table is not None:
-            record = self.searchForVar(table, key)
-            if record is not None:
-                 return record
-            print(self)
 
-            return self.searchParentTree(table.parentRef, key)
-            
-        return None # Did not find key'''
+    
 
 if __name__ == "__main__":
     sym = symTable()
