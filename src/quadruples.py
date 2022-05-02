@@ -34,9 +34,9 @@ class Quadruples:
             # Check top of the stack
             oper = self.pOperators.pop()
             self.pOperators.append(oper)
-            if(oper == operator):
+            if(oper == operator or oper in operator):
                 oper = self.pOperators.pop()
-                right_operand = self.pOperands.pop()  # right operand
+                '''right_operand = self.pOperands.pop()  # right operand
                 left_operand = self.pOperands.pop()  # left operand
                 right_type = self.pTypes.pop()
                 left_type = self.pTypes.pop()
@@ -50,7 +50,7 @@ class Quadruples:
                     # Add the temporal variable to the Operands stack
                     self.pOperands.append(temp)
                 else:
-                    print("Type Mismatch")
+                    print("Type Mismatch")'''
             else:
                 self.pOperators.append(operator)
         else:

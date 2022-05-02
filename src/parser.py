@@ -66,6 +66,7 @@ class StartlightParser(Parser):
             record.setChildRef(symMngr.getNewSymTable())
             symMngr.insertRecord('VARS',record.returnRecord())
             record.clearCurrentRecord()
+            print(symMngr[-1])
         else:
             # What to do when table already exists?
             # Created at function parameters
@@ -381,7 +382,18 @@ class StartlightParser(Parser):
     # Var_cte integer, float, char, string
     @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR')
     def var_cte(self, p):
-        pass
+        if symMngr.canPushOrPop:
+            # If no global variable table
+            if not symMngr[0].hasVarTable():
+                record.setType("Var Table")
+                # TODO: Need parent ref
+                record.setChildRef(symMngr.getNewSymTable())
+                symMngr[0].saveRecord('VARS',record.returnRecord())
+                record.clearCurrentRecord()
+                print(symMngr[-1])
+            
+            print(type(p[-1]))
+            symMngr[0]['VARS']['childRef'][p[-1]] = p[-1]
 
     # Main
     @_('MAIN np_save_main_id "(" ")" opt_vars "{" body "}"')
