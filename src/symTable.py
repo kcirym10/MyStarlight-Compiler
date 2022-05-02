@@ -9,7 +9,6 @@ from typing import Dict
 class symTable(Dict):
     scopeLevel = 0 # Class attribute might change
     def __init__(self, parentRef = None, is_varTable = False):
-        print("New Symbol Table") 
         self.parentRef = parentRef # Allows for searches into the parent tree
     
     def hasVarTable(self):
