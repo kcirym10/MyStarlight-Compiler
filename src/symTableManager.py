@@ -59,6 +59,9 @@ class symTableManager(List):
         else:
             self.canPushOrPop = True
 
+    def getKeyRecord(self, key):
+        self[-1].searchKey(key)
+
 if __name__ == "__main__":
     symMngr = symTableManager()
     key = "Program"
