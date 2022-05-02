@@ -24,7 +24,9 @@ class symTable(Dict):
         return False
     
     def getFuncRecord(self, key):
-        return self[key]
+        if key in self:
+            return self[key]
+        return None
 
     def varKeyNotExists(self, key):
         if key not in self['VARS']['childRef']:
@@ -32,7 +34,9 @@ class symTable(Dict):
         return False
 
     def getVarRecord(self, key):
-        return self['VARS']['childRef'][key]
+        if key in self['VARS']['childRef']:
+            return self['VARS']['childRef'][key]
+        return None
         
     # Generic for both functions (scopes) and variables
     def saveRecord(self, key, value):
