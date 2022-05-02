@@ -5,6 +5,7 @@ from record import Record
 from symTable import symTable
 from symTableManager import symTableManager
 import os.path
+import copy
 
 
 class StartlightParser(Parser):
@@ -120,7 +121,7 @@ class StartlightParser(Parser):
         pass
 
     # Classes
-    @_('CLASS np_prepare_class CLASS_ID opt_derivation "{" opt_vars opt_methods "}" classes', 'eps')
+    @_('CLASS np_prepare_class CLASS_ID np_save_func_id opt_derivation "{" opt_vars opt_methods "}" np_exit_scope classes', 'eps')
     def classes(self, p):
         pass
 
@@ -128,9 +129,27 @@ class StartlightParser(Parser):
     def np_prepare_class(self, p):
         symMngr.setCurrentType(record.getClassType())
 
-    @_('DERIVES CLASS_ID', 'eps')
+    @_('DERIVES CLASS_ID np_copy_class_record', 'eps')
     def opt_derivation(self, p):
         pass
+
+    @_('')
+    def np_copy_class_record(self, p):
+        print(p[-4])
+        if len(symMngr) > 1:
+            classRecord = symMngr[-2].getFuncRecord(p[-1])
+            if classRecord:
+                print(classRecord['childRef'])
+                
+                # Need to create copy of contents into a new symTable object
+                # deepcopy from the copy module creates a new object and copies all of the children from the
+                # original object. These will not be modified in any changes.
+                symMngr[-2][p[-4]] = copy.deepcopy(classRecord) # Gets pointer to record
+                symMngr.pop()
+                symMngr.pushTable(symMngr[-1][p[-4]]['childRef'])
+            else:
+                print("Undefined class derivation")
+            
 
     @_('methods', 'eps')
     def opt_methods(self, p):
