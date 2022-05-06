@@ -59,23 +59,22 @@ class StartlightParser(Parser):
 
     @_('')
     def np_create_var_table(self, p):
-        # 1 Check if current table already has a vars table
-        if not symMngr[-1].hasVarTable():
-            record.setType("Var Table")
-            # TODO: Need parent ref
-            record.setChildRef(symMngr.getNewSymTable())
-            symMngr.insertRecord('VARS',record.returnRecord())
-            record.clearCurrentRecord()
-            print(symMngr[-1])
-        else:
-            # What to do when table already exists?
-            # Created at function parameters
-            print(":)")
+        if symMngr.canPushOrPop:
+            # 1 Check if current table already has a vars table
+            if not symMngr[-1].hasVarTable():
+                record.setType("Var Table")
+                # TODO: Need parent ref
+                record.setChildRef(symMngr.getNewSymTable())
+                symMngr.insertRecord('VARS',record.returnRecord())
+                record.clearCurrentRecord()
+            else:
+                # What to do when table already exists?
+                # Created at function parameters
+                print(":)")
     
     @_('')
     def np_exit_scope(self, p):
         symMngr.popRecord()
-        #print(symMngr)
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
     def var_type(self, p):
@@ -136,11 +135,9 @@ class StartlightParser(Parser):
 
     @_('')
     def np_copy_class_record(self, p):
-        print(p[-4])
         if len(symMngr) > 1:
             classRecord = symMngr[-2].getFuncRecord(p[-1])
             if classRecord:
-                print(classRecord['childRef'])
                 
                 # Need to create copy of contents into a new symTable object
                 # deepcopy from the copy module creates a new object and copies all of the children from the
@@ -390,13 +387,11 @@ class StartlightParser(Parser):
                 record.setChildRef(symMngr.getNewSymTable())
                 symMngr[0].saveRecord('VARS',record.returnRecord())
                 record.clearCurrentRecord()
-                print(symMngr[-1])
             
-            print(type(p[-1]))
             symMngr[0]['VARS']['childRef'][p[-1]] = p[-1]
 
     # Main
-    @_('MAIN np_save_main_id "(" ")" opt_vars "{" body "}"')
+    @_('MAIN np_save_main_id "(" ")" opt_vars "{" body "}" np_exit_scope')
     def main(self, p):
         pass
 
