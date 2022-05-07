@@ -14,6 +14,9 @@ class Record:
     def setType(self, type):
         self.currentRecord['type'] = type
 
+    def setMemoryAdress(self, address):
+        self.currentRecord['address'] = address
+
     def setChildRef(self, childRef):
         self.currentRecord['childRef'] = childRef
 
@@ -21,7 +24,7 @@ class Record:
         return self.currentRecord['childRef']
 
     def clearCurrentRecord(self):
-        self.currentRecord = {'type': None, 'childRef': None}
+        self.currentRecord = {'type': None, 'address': None, 'childRef': None}
 
     def returnRecord(self):
         return self.currentRecord
