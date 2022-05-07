@@ -39,6 +39,11 @@ class symTableManager(List):
         if self[-1].keyNotExists(key):
             return True
         return False
+
+    # Search for atomic record (function or variable)
+    def searchAtomic(self, key):
+        return self[-1].searchKey(key)
+
     # Pushes a new Symbol Table to the top of the stack
     # this could be a new scope (such as a function)
     def pushTable(self, table):
