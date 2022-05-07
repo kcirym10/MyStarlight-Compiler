@@ -1,3 +1,5 @@
+import copy
+
 from virtualMemory import memoryArchitecture
 
 class Avail:
@@ -14,5 +16,5 @@ class Avail:
 
     def hardReset(self):
         #del(self.address)
-        self.address = memoryArchitecture["TS"].copy()
+        self.address = copy.deepcopy(memoryArchitecture["TS"])
 
