@@ -307,7 +307,7 @@ class StartlightParser(Parser):
                 operand = p[-3]
                 record = symMngr.searchAtomic(operand)
                 if record:
-                    print("Key: ", operand, " Record: ", record)
+                    #print("Key: ", operand, " Record: ", record)
                     quads.pushOperandType(operand, record['type'])
                 else:
                     print(f"Key: \"{p[-3]}\" is not defined")
@@ -370,8 +370,8 @@ class StartlightParser(Parser):
         if symMngr.canPushOrPop:
             quads.createIfTopIs(("<", ">", ">=", "<=", "!=", "=="))
 
-    @_('"<" np_push_operator m_exp', '">" np_push_operator m_exp', 'GREATER_OR_EQUAL_TO np_push_operator m_exp', 
-        'LESS_OR_EQUAL_TO np_push_operator m_exp', 'NOT_EQUAL_TO np_push_operator m_exp', 'EQUAL_TO np_push_operator m_exp', 'eps')
+    @_('"<" np_push_operator g_exp', '">" np_push_operator g_exp', 'GREATER_OR_EQUAL_TO np_push_operator g_exp', 
+        'LESS_OR_EQUAL_TO np_push_operator g_exp', 'NOT_EQUAL_TO np_push_operator g_exp', 'EQUAL_TO np_push_operator g_exp', 'eps')
     def g_exp_opers(self, p):
         pass
 
@@ -407,9 +407,20 @@ class StartlightParser(Parser):
         pass
         
     # F
-    @_('"(" expression ")"', 'variable', 'call_func_body', 'var_cte')
+    @_('"(" np_add_fake_bottom expression ")" np_rem_fake_bottom', 'variable', 'call_func_body', 'var_cte')
     def f(self, p):
         pass
+
+    @_('')
+    def np_add_fake_bottom(self, p):
+        if symMngr.canPushOrPop:
+            quads.pushOperator('(')
+
+    @_('')
+    def np_rem_fake_bottom(self, p):
+        if symMngr.canPushOrPop:
+            if quads.operatorStack[-1] == '(':
+                quads.operatorStack.pop()
 
     # Var_cte integer, float, char, string
     @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR')
@@ -466,7 +477,7 @@ if __name__ == '__main__':
 
         result = parser.parse(lexer.tokenize(s))
         #print(result)
-        print(symMngr)
+        #print(symMngr)
         print(quads.operatorStack) # TODO: Fix Var Table and Sym Table
         print(quads.operandStack)
         print(quads.typeStack)
