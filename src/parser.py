@@ -1,11 +1,13 @@
+import os.path
+import copy
+
 from sly import Parser
 from lexer import StartlightLexer
 from quadruples import Quadruples
 from record import Record
 from symTable import symTable
 from symTableManager import symTableManager
-import os.path
-import copy
+from virtualMemory import VirtualMemory
 
 
 class StartlightParser(Parser):
@@ -32,6 +34,8 @@ class StartlightParser(Parser):
         record = Record()
         global quads
         quads = Quadruples()
+        global vMem
+        vMem = VirtualMemory()
         record.setType(record.getProgramType())
     
     @_('')
@@ -67,13 +71,15 @@ class StartlightParser(Parser):
                 record.setChildRef(symMngr.getNewSymTable())
                 symMngr.insertRecord('VARS',record.returnRecord())
                 record.clearCurrentRecord()
-            else:
-                # What to do when table already exists?
-                # Created at function parameters
-                print(":)")
+            # else:
+            #     # What to do when table already exists?
+            #     # Created at function parameters
+            #     print(":)")
     
     @_('')
     def np_exit_scope(self, p):
+        vMem.resetLocal()
+        quads.resetAvail()
         symMngr.popRecord()
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
@@ -94,6 +100,12 @@ class StartlightParser(Parser):
         if symMngr.canPushOrPop:
             if symMngr.isVarKeyDeclared(p[-1]):
                 record.setType(symMngr.getCurrentType())
+                if str.islower(symMngr.getCurrentType()):
+                    if len(symMngr) == 1:
+                        memAddress = vMem.nextGlobal(symMngr.getCurrentType())
+                    else:
+                        memAddress = vMem.nextLocal(symMngr.getCurrentType())
+                    record.setMemoryAdress(memAddress)
                 symMngr.insertVarRecord(p[-1], record.returnRecord())
                 record.clearCurrentRecord()
             else:
@@ -307,8 +319,9 @@ class StartlightParser(Parser):
                 operand = p[-3]
                 record = symMngr.searchAtomic(operand)
                 if record:
-                    #print("Key: ", operand, " Record: ", record)
-                    quads.pushOperandType(operand, record['type'])
+                    #print(operand, ' ', record['address'])
+                    #quads.pushOperandType(operand, record['type'])
+                    quads.pushOperandType(record["address"], record['type'])
                 else:
                     print(f"Key: \"{p[-3]}\" is not defined")
 
@@ -434,7 +447,13 @@ class StartlightParser(Parser):
                 symMngr[0].saveRecord('VARS',record.returnRecord())
                 record.clearCurrentRecord()
             
-            symMngr[0]['VARS']['childRef'][p[-1]] = p[-1]
+            cteType = str(type(p[-1]).__name__)
+            memAddress = vMem.nextConstant(cteType)
+            symMngr[0]['VARS']['childRef'][p[-1]] = memAddress
+
+            # Insert into quadruples
+            quads.pushOperandType(memAddress, cteType)
+
 
     # Main
     @_('MAIN np_save_main_id "(" ")" opt_vars "{" body "}" np_exit_scope')
