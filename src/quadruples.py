@@ -7,22 +7,20 @@ from semanticCube import semanticCube
 class Quadruples:
 
     # Operators stack
-    pOperators = deque()
+    operatorStack = deque()
     # Operand stack
-    pOperands = deque()
+    operandStack = deque()
     # Types stack
-    pTypes = deque()
+    typeStack = deque()
     cube = semanticCube()  # Should we create the object here (?)
     pQuadruples = deque()
 
-    def pushOperand(self, operand):
-        # TODO: use variable to receive a record such as record = symTabMngr.getRecord(operand)
-        if(operand != None):  # Here really goes searchSymbolTable(operand) != None
-            self.pOperands.append(operand)
-            type = 'INT'  # Here really goes symTable.getType(operand)
-            self.pTypes.append(type)
-        else:
-            print("Variable not declared")
+    def pushOperandType(self, operand, opType):
+        self.operandStack.append(operand)
+        self.typeStack.append(opType)
+
+    def pushOperator(self, operator):
+        self.operatorStack.append(operator)
 
     def createQuadruple(self, operator, left_operand, right_operand, temp):
         quadruple = operator + left_operand + right_operand + temp
