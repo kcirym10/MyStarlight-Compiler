@@ -9,6 +9,9 @@ class Quadruples:
     # Temporary Address Manager
     avail = Avail()
 
+    def resetAvail(self):
+        self.avail.hardReset()
+
     # Operators stack
     operatorStack = deque()
     # Operand stack
@@ -23,7 +26,6 @@ class Quadruples:
         self.typeStack.append(opType)
 
     def pushOperator(self, operator):
-        print(operator)
         self.operatorStack.append(operator)
 
     def createQuadruple(self, operator, left_operand, right_operand, temp):
@@ -39,7 +41,7 @@ class Quadruples:
             self.operatorStack.append(oper)
             # print("In create")
             if(oper in operator):
-                print(oper)
+                #print(oper)
                 oper = self.operatorStack.pop()
                 # self.operatorStack.append(oper)
                 #print("Operator: ", oper)
