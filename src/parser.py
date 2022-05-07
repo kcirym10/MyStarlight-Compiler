@@ -327,7 +327,8 @@ class StartlightParser(Parser):
 
     @_('')
     def np_check_or_operator(self, p):
-        pass
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("|"))
 
     @_('"|" np_push_operator expression', 'eps')
     def exp_or(self, p):
@@ -351,17 +352,12 @@ class StartlightParser(Parser):
 
     @_('')
     def np_check_and_operator(self, p):
-        pass
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("&"))
 
     @_('"&" np_push_operator t_exp', 'eps')
     def t_and(self, p):
         pass
-
-    # Passes tuple of and operators to compare
-    @_('')
-    def np_push_and_operator(self, p):
-        if symMngr.canPushOrPop:
-            quads.createIfTopIs(("&"))
 
     # G_EXP
     @_('m_exp np_check_g_operator g_exp_opers')
@@ -371,8 +367,8 @@ class StartlightParser(Parser):
     # Passes tuple of g operators to compare
     @_('')
     def np_check_g_operator(self, p):
-        #quads.createIfTopIs(("<", ">", ">=", "<=", "!=", "=="))
-        pass
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("<", ">", ">=", "<=", "!=", "=="))
 
     @_('"<" np_push_operator m_exp', '">" np_push_operator m_exp', 'GREATER_OR_EQUAL_TO np_push_operator m_exp', 
         'LESS_OR_EQUAL_TO np_push_operator m_exp', 'NOT_EQUAL_TO np_push_operator m_exp', 'EQUAL_TO np_push_operator m_exp', 'eps')
@@ -384,19 +380,15 @@ class StartlightParser(Parser):
     def m_exp(self, p):
         pass
     
+    # Passes tuple of m operators to compare
     @_('')
     def np_check_m_operator(self, p):
-        pass
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("+", "-"))
 
     @_('"+" np_push_operator m_exp', '"-" np_push_operator m_exp', 'eps')
     def m_opers(self, p):
         pass
-    
-    # Passes tuple of m operators to compare
-    @_('')
-    def np_push_m_operator(self, p):
-        if symMngr.canPushOrPop:
-            quads.createIfTopIs(("+", "-"))
 
     # T (multuplication and division)
     @_('f np_check_t_operator t_opers')
@@ -406,7 +398,8 @@ class StartlightParser(Parser):
     # Passes tuple of t operators to compare
     @_('')
     def np_check_t_operator(self, p):
-        # quads.createIfTopIs(('*', '/'))
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(('*', '/'))
         pass
 
     @_('"*" np_push_operator t', '"/" np_push_operator t', 'eps')
