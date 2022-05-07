@@ -39,8 +39,6 @@ class semanticCube:
                 OperatorType.MUL: AtomicType.INT,
                 OperatorType.DIV: AtomicType.INT,
                 OperatorType.ASSIGN: AtomicType.INT,
-                OperatorType.AND: AtomicType.BOOL,
-                OperatorType.OR: AtomicType.BOOL,
                 OperatorType.GREATER: AtomicType.BOOL,
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
@@ -53,9 +51,6 @@ class semanticCube:
                 OperatorType.SUB: AtomicType.FLOAT,
                 OperatorType.MUL: AtomicType.FLOAT,
                 OperatorType.DIV: AtomicType.FLOAT,
-                OperatorType.ASSIGN: AtomicType.INT,
-                OperatorType.AND: AtomicType.BOOL,
-                OperatorType.OR: AtomicType.BOOL,
                 OperatorType.GREATER: AtomicType.BOOL,
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
@@ -72,8 +67,7 @@ class semanticCube:
                 OperatorType.SUB: AtomicType.FLOAT,
                 OperatorType.MUL: AtomicType.FLOAT,
                 OperatorType.DIV: AtomicType.FLOAT,
-                OperatorType.AND: AtomicType.BOOL,
-                OperatorType.OR: AtomicType.BOOL,
+                OperatorType.ASSIGN: AtomicType.FLOAT,
                 OperatorType.GREATER: AtomicType.BOOL,
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
@@ -86,13 +80,18 @@ class semanticCube:
                 OperatorType.SUB: AtomicType.FLOAT,
                 OperatorType.MUL: AtomicType.FLOAT,
                 OperatorType.DIV: AtomicType.FLOAT,
-                OperatorType.AND: AtomicType.BOOL,
-                OperatorType.OR: AtomicType.BOOL,
+                OperatorType.ASSIGN: AtomicType.FLOAT,
                 OperatorType.GREATER: AtomicType.BOOL,
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
                 OperatorType.SMALLER_EQUAL: AtomicType.BOOL,
                 OperatorType.EQUALS: AtomicType.BOOL
+            }
+        },
+        AtomicType.BOOL: {
+            AtomicType.BOOL: {
+                OperatorType.AND: AtomicType.BOOL,
+                OperatorType.OR: AtomicType.BOOL
             }
         }
     }
