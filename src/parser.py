@@ -447,9 +447,14 @@ class StartlightParser(Parser):
                 symMngr[0].saveRecord('VARS',record.returnRecord())
                 record.clearCurrentRecord()
             
+            searchRes = symMngr.searchAtomic(p[-1])
             cteType = str(type(p[-1]).__name__)
-            memAddress = vMem.nextConstant(cteType)
-            symMngr[0]['VARS']['childRef'][p[-1]] = memAddress
+            if searchRes == None:
+                memAddress = vMem.nextConstant(cteType)
+                symMngr[0]['VARS']['childRef'][p[-1]] = memAddress
+            else:
+                memAddress = searchRes
+                print("Value: ", p[-1], " Address: ",searchRes)
 
             # Insert into quadruples
             quads.pushOperandType(memAddress, cteType)
