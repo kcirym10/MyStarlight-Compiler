@@ -28,7 +28,7 @@ class Quadruples:
     def pushOperator(self, operator):
         self.operatorStack.append(operator)
 
-    def createQuadruple(self, operator, left_operand, right_operand, temp):
+    def createQuadruple(self, operator, left_operand = None, right_operand = None, temp = None):
         quadruple = (operator, left_operand, right_operand, temp)
         self.pQuadruples.append(quadruple)
         print(f'{self.pQuadruples[-1][0]},\t{self.pQuadruples[-1][1]},\t{self.pQuadruples[-1][2]},\t{self.pQuadruples[-1][3]}')
