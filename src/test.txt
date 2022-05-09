@@ -1,87 +1,40 @@
 program patito;
-
-var int i, j;
-
-class Vehicle{
-            var
-                int size;
-            methods:
-                func void setSize(int newSize){
-                    size = newSize;
-                }
-        }
-class Car derives Vehicle{}
-class Class1{
+var
+    int i;
+class ParentCar {
     var
-        int i2;
+        int i;
+}
+
+class Car derives ParentCar{
+    var
+        int j;
     methods:
-        func void f1(int x){
-            a=b;
-            read(a);
-            print(a);
-            if (a == b){
-                a = b;
-            }
-            else{
-                print("Sorry");
-            }
-            for (i = a - 10 to b){
-                print(a);
-            }
-            while (a < b){
-                print(b);
-            }
-            car.f1();
-            car2.f2(a, b);
+        func int test(){
 
-            a = car1.size;
-            a = (car.size + 10)-50/100+2;
-            return ((car.size + 10) - 100/50 * 2);
-            return (a);
         }
 }
 
-class Class2 derives Class1{
-    
-}
-
-func float arithmetic(){
-            return ((car.size + 10) - 100/50 * 2);
-        }
-
-func float recursiveSumUntilZero(int x){
-            if (x == 0){
-                return(0);
+func float arithmetic(int param1)
+var
+    float i, a, b, c, d, e;
+{           if (((i + a) - b/c * d >= e) | ((i > a) & (b < c))){
+                a =  156 / c;
             }
-
-            return (x.x(x()));
-            return (x + recursiveSumUntilZero(x - 1));
         }
 
-func void callWithNewSize(int x){
-            car1.setSize(x);
+func float arithmetic(int param1)
+var
+    int i;
+{
+            return (i / (car.size + 10) - 100/50 * 2);
         }
 
 main()
-var 
-    int inputSize, inputCount;
+var
+    Test test;
+    Car car2;
+    float j;
 {
-    print("Enter number of car sizes: ");
-    read(inputCount);
-    for (i = 0 to 9){
-        c[i] = 'c';
-    }
-
-    for (i = 0 to inputCount){
-        print("Size: ");
-        read(inputSize);
-        callWithNewSize(inputSize);
-        car2.setSize(inputSize);
-        print("Car 1 size ", car1.size, "Car 2 size ", car2.size);
-    }
-
-    j = 10;
-    while (j > 0){
-        print("Sum of ", j, " is ", recursiveSumUntilZero(j));
-    }
+    j = 10 / 10 + 11 / 11 + 12 / 12 + 13.0 / 13 + 14.0 / 14;
 }
