@@ -35,6 +35,9 @@ var
     Test test;
     Car car2;
     float j;
+    int i;
 {
     j = 10 / 10 + 11 / 11 + 12 / 12 + 13.0 / 13 + 14.0 / 14;
+    print("hola", j+10);
+    read(i);
 }

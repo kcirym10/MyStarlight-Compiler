@@ -23,26 +23,25 @@ class StartlightParser(Parser):
     @_('PROGRAM np_create_global_symTable ID np_program_record ";" opt_vars opt_classes opt_funcs main')
     def program(self, p):
         print("Successfully compiled uwu")
-    
+
     # Initializes all global variables
     @_('')
     def np_create_global_symTable(self, p):
         #print("Program type")
         global symMngr
         symMngr = symTableManager()
-        global record 
+        global record
         record = Record()
         global quads
         quads = Quadruples()
         global vMem
         vMem = VirtualMemory()
         record.setType(record.getProgramType())
-    
+
     @_('')
     def np_program_record(self, p):
         symMngr.insertRecord(p[-1], record.returnRecord())
         record.clearCurrentRecord()
-        
 
     @_('vars', 'eps')
     def opt_vars(self, p):
@@ -69,13 +68,13 @@ class StartlightParser(Parser):
                 record.setType("Var Table")
                 # TODO: Need parent ref
                 record.setChildRef(symMngr.getNewSymTable())
-                symMngr.insertRecord('VARS',record.returnRecord())
+                symMngr.insertRecord('VARS', record.returnRecord())
                 record.clearCurrentRecord()
             # else:
             #     # What to do when table already exists?
             #     # Created at function parameters
             #     print(":)")
-    
+
     @_('')
     def np_exit_scope(self, p):
         vMem.resetLocal()
@@ -152,16 +151,16 @@ class StartlightParser(Parser):
             if len(symMngr) > 1:
                 classRecord = symMngr[-2].getFuncRecord(p[-1])
                 if classRecord:
-                    
+
                     # Need to create copy of contents into a new symTable object
                     # deepcopy from the copy module creates a new object and copies all of the children from the
                     # original object. These will not be modified in any changes.
-                    symMngr[-2][p[-4]] = copy.deepcopy(classRecord) # Gets pointer to record
+                    # Gets pointer to record
+                    symMngr[-2][p[-4]] = copy.deepcopy(classRecord)
                     symMngr.pop()
                     symMngr.pushTable(symMngr[-1][p[-4]]['childRef'])
                 else:
                     print("Undefined class derivation")
-            
 
     @_('methods', 'eps')
     def opt_methods(self, p):
@@ -217,7 +216,7 @@ class StartlightParser(Parser):
     @_('INT', 'FLOAT', 'CHAR')
     def type(self, p):
         if symMngr.canPushOrPop:
-            symMngr.setCurrentType(p[-1]) # sets the symMngr's current type
+            symMngr.setCurrentType(p[-1])  # sets the symMngr's current type
 
     # Body
     @_('opt_stmts')
@@ -238,18 +237,28 @@ class StartlightParser(Parser):
     def print(self, p):
         pass
 
-    @_('CTE_STRING more_args', 'expression more_args')
+    @_('CTE_STRING np_create_print_quad more_args', 'expression np_create_print_quad more_args')
     def p_args(self, p):
         pass
+
+    @_('')
+    def np_create_print_quad(self, p):
+        if symMngr.canPushOrPop:
+            quads.createPRQuad(p[-1], True)
 
     @_('"," p_args', 'eps')
     def more_args(self, p):
         pass
 
     # Read Statement
-    @_('READ "(" variable ")" ";"')
+    @_('READ "(" variable np_create_read_quad ")" ";"')
     def read(self, p):
         pass
+
+    @_('')
+    def np_create_read_quad(self, p):
+        if symMngr.canPushOrPop:
+            quads.createPRQuad(p[-1], False)
 
     # Assign Statement
     @_('variable "=" np_push_operator expression ";" np_check_assignment_operator')
@@ -356,7 +365,7 @@ class StartlightParser(Parser):
     def np_push_operator(self, p):
         if symMngr.canPushOrPop:
             quads.pushOperator(p[-1])
-    
+
     # Passes tuple of or operators to compare
     @_('')
     def np_push_or_operator(self, p):
@@ -381,14 +390,14 @@ class StartlightParser(Parser):
     @_('m_exp np_check_g_operator g_exp_opers')
     def g_exp(self, p):
         pass
-    
+
     # Passes tuple of g operators to compare
     @_('')
     def np_check_g_operator(self, p):
         if symMngr.canPushOrPop:
             quads.createIfTopIs(("<", ">", ">=", "<=", "!=", "=="))
 
-    @_('"<" np_push_operator g_exp', '">" np_push_operator g_exp', 'GREATER_OR_EQUAL_TO np_push_operator g_exp', 
+    @_('"<" np_push_operator g_exp', '">" np_push_operator g_exp', 'GREATER_OR_EQUAL_TO np_push_operator g_exp',
         'LESS_OR_EQUAL_TO np_push_operator g_exp', 'NOT_EQUAL_TO np_push_operator g_exp', 'EQUAL_TO np_push_operator g_exp', 'eps')
     def g_exp_opers(self, p):
         pass
@@ -397,7 +406,7 @@ class StartlightParser(Parser):
     @_('t np_check_m_operator m_opers')
     def m_exp(self, p):
         pass
-    
+
     # Passes tuple of m operators to compare
     @_('')
     def np_check_m_operator(self, p):
@@ -423,7 +432,7 @@ class StartlightParser(Parser):
     @_('"*" np_push_operator t', '"/" np_push_operator t', 'eps')
     def t_opers(self, p):
         pass
-        
+
     # F
     @_('"(" np_add_fake_bottom expression ")" np_rem_fake_bottom', 'variable', 'call_func_body', 'var_cte')
     def f(self, p):
@@ -449,23 +458,24 @@ class StartlightParser(Parser):
                 record.setType("Var Table")
                 # TODO: Need parent ref
                 record.setChildRef(symMngr.getNewSymTable())
-                symMngr[0].saveRecord('VARS',record.returnRecord())
+                symMngr[0].saveRecord('VARS', record.returnRecord())
                 record.clearCurrentRecord()
-            
+
             searchRes = symMngr.searchAtomic(str(p[-1]))
-            cteType = str(type(p[-1]).__name__) # Gets the data type from the constant token
+            # Gets the data type from the constant token
+            cteType = str(type(p[-1]).__name__)
             if searchRes == None:
                 memAddress = vMem.nextConstant(cteType)
                 symMngr[0]['VARS']['childRef'][str(p[-1])] = memAddress
             else:
                 memAddress = searchRes
-                print("Value: ", p[-1], " Address: ",searchRes)
+                print("Value: ", p[-1], " Address: ", searchRes)
 
             # Insert into quadruples
             quads.pushOperandType(memAddress, cteType)
 
-
     # Main
+
     @_('MAIN np_save_main_id "(" ")" opt_vars "{" body "}" np_exit_scope')
     def main(self, p):
         pass
@@ -505,9 +515,9 @@ if __name__ == '__main__':
             s += s1
 
         result = parser.parse(lexer.tokenize(s))
-        #print(result)
-        #print(symMngr)
-        print(quads.operatorStack) # TODO: Fix Var Table and Sym Table
+        # print(result)
+        # print(symMngr)
+        print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
         print(quads.operandStack)
         print(quads.typeStack)
     except EOFError:
