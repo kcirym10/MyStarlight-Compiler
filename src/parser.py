@@ -252,9 +252,14 @@ class StartlightParser(Parser):
         pass
 
     # Assign Statement
-    @_('variable "=" expression ";"')
+    @_('variable "=" np_push_operator expression ";" np_check_assignment_operator')
     def assign(self, p):
         pass
+
+    @_('')
+    def np_check_assignment_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("="))
 
     # Conditional Statement
     @_('IF "(" expression ")" "{" body "}" opt_else')
@@ -447,11 +452,11 @@ class StartlightParser(Parser):
                 symMngr[0].saveRecord('VARS',record.returnRecord())
                 record.clearCurrentRecord()
             
-            searchRes = symMngr.searchAtomic(p[-1])
-            cteType = str(type(p[-1]).__name__)
+            searchRes = symMngr.searchAtomic(str(p[-1]))
+            cteType = str(type(p[-1]).__name__) # Gets the data type from the constant token
             if searchRes == None:
                 memAddress = vMem.nextConstant(cteType)
-                symMngr[0]['VARS']['childRef'][p[-1]] = memAddress
+                symMngr[0]['VARS']['childRef'][str(p[-1])] = memAddress
             else:
                 memAddress = searchRes
                 print("Value: ", p[-1], " Address: ",searchRes)
