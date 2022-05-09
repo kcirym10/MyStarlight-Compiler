@@ -28,7 +28,7 @@ class Quadruples:
     def pushOperator(self, operator):
         self.operatorStack.append(operator)
 
-    def createQuadruple(self, operator, left_operand = None, right_operand = None, temp = None):
+    def createExpressionQuadruple(self, operator, left_operand = None, right_operand = None, temp = None):
         quadruple = (operator, left_operand, right_operand, temp)
         self.pQuadruples.append(quadruple)
         print(f'{self.pQuadruples[-1][0]},\t{self.pQuadruples[-1][1]},\t{self.pQuadruples[-1][2]},\t{self.pQuadruples[-1][3]}')
@@ -55,11 +55,14 @@ class Quadruples:
                 tempType = semantics(left_type, right_type, oper)
                 #print("TEMP TYPE: ",tempType)
                 if(tempType != None):
-                    # Assign a memory space to temp
-                    temp = self.avail.next(tempType)
-                    self.createQuadruple(oper, str(left_operand), str(right_operand), str(temp))
-                    # Add the temporal variable to the Operands stack
-                    self.operandStack.append(temp)
-                    self.typeStack.append(tempType)
+                    if oper == '=':
+                        self.createExpressionQuadruple(oper, right_operand, None, left_operand)
+                    else:
+                        # Assign a memory space to temp
+                        temp = self.avail.next(tempType)
+                        self.createExpressionQuadruple(oper, left_operand, right_operand, temp)
+                        # Add the temporal variable to the Operands stack
+                        self.operandStack.append(temp)
+                        self.typeStack.append(tempType)
                 else:
                     print("Type Mismatch")
