@@ -300,9 +300,21 @@ class StartlightParser(Parser):
     def for_loop(self, p):
         pass
 
-    @_('WHILE "(" expression ")" "{" body "}"')
+    @_('WHILE np_cycle_start "(" expression ")" np_while "{" body "}" np_while_return')
     def while_loop(self, p):
         pass
+
+    @_('')
+    def np_cycle_start(self, p):
+        quads.addJump()
+
+    @_('')
+    def np_while(self, p):
+        quads.createGotoF()
+
+    @_('')
+    def np_while_return(self, p):
+        quads.createGoto()
 
     # Call Func Statement
     @_('call_func_body ";"')

@@ -119,12 +119,17 @@ class Quadruples:
             result = self.operandStack.pop()
             self.createQuadruple(self.quadCodes['goF'], result, None, None)
             self.jumpStack.append(self.ip - 1)
+        else:
+            print("ERROR: Expected bool result")
 
     def createGoto(self):
         self.createQuadruple(self.quadCodes['go'])
         quadNum = self.jumpStack.pop()
         self.jumpStack.append(self.ip - 1)
-        self.fill(quadNum, self.ip)    
+        self.fill(quadNum, self.ip)   
+
+    def addJump(self):
+        self.jumpStack.append(self.ip) 
 
     def __str__(self):
         columns = 3
