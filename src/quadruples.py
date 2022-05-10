@@ -9,7 +9,7 @@ class Quadruples:
     # Temporary Address Manager
     avail = Avail()
 
-    # List of codes that will be passed to the virtual machine
+    # List of codes that will be passed to the virtual machine and used in quadruples
     quadCodes = {
         'p' : 'PRINT',
         'r' : 'READ',
@@ -90,18 +90,20 @@ class Quadruples:
     def createPRQuad(self, value, isPrint):
         # If the value is a cte string
         if isPrint:
+            code = self.quadCodes['p']
             if value:
                 # Change "Print" value to a defined type
-                self.createQuadruple("PRINT", None, None, value)
+                self.createQuadruple(code, None, None, value)
             else:
                 # If you have an expression
                 exprValue = self.operandStack.pop()  # get the value of the resultant expression
                 self.typeStack.pop()
-                self.createQuadruple("PRINT", None, None, exprValue)
+                self.createQuadruple(code, None, None, exprValue)
         else:
+            code = self.quadCodes['r']
             exprValue = self.operandStack.pop()  # get the value of the resultant expression
             self.typeStack.pop()
-            self.createQuadruple("READ", None, None, exprValue)
+            self.createQuadruple(code, None, None, exprValue)
 
     def fill(self, quadNum, destination):
         self.quadList[quadNum][3] = destination
