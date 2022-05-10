@@ -17,11 +17,22 @@ class Car derives ParentCar{
 
 func float arithmetic(int param1)
 var
-    float i, a, b, c, d, e;
-{           if (((i + a) - b/c * d >= e) | ((i > a) & (b < c))){
-                a =  156 / c;
-            }
+float i, a, b, c, d, e;
+{           
+    while (a < b){
+        if (((i + a) - b/c * d >= e) | ((i > a) & (b < c))){
+            a =  156 / c;
         }
+        else{
+            a = 10;
+            b = c - 5 * (4 + e);
+        }
+    }
+
+    if (a > b){
+        a = 0;
+    }
+}
 
 func float arithmetic(int param1)
 var
