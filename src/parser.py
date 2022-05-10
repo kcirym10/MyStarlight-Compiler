@@ -469,7 +469,7 @@ class StartlightParser(Parser):
                 symMngr[0]['VARS']['childRef'][str(p[-1])] = memAddress
             else:
                 memAddress = searchRes
-                print("Value: ", p[-1], " Address: ", searchRes)
+                #print("Value: ", p[-1], " Address: ", searchRes)
 
             # Insert into quadruples
             quads.pushOperandType(memAddress, cteType)
