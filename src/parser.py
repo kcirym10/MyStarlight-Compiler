@@ -271,13 +271,25 @@ class StartlightParser(Parser):
             quads.createIfTopIs(("="))
 
     # Conditional Statement
-    @_('IF "(" expression ")" "{" body "}" opt_else')
+    @_('IF "(" expression ")" np_if "{" body "}" opt_else np_end_if')
     def conditional(self, p):
         pass
 
-    @_('ELSE "{" body "}"', 'eps')
+    @_('')
+    def np_if(self, p): # Implement if NP 1
+        quads.createGotoF()
+
+    @_('')
+    def np_end_if(self, p):
+        quads.fillGotos()
+
+    @_('ELSE np_else "{" body "}"', 'eps')
     def opt_else(self, p):
         pass
+    
+    @_('')
+    def np_else(self, p):
+        quads.createGoto()
 
     # Cycles Statement
     @_('for_loop', 'while_loop')
@@ -520,5 +532,6 @@ if __name__ == '__main__':
         print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
         print(quads.operandStack)
         print(quads.typeStack)
+        print(quads)
     except EOFError:
         print("Error" + EOFError)
