@@ -9,6 +9,9 @@ class Quadruples:
     # Temporary Address Manager
     avail = Avail()
 
+    # List of codes that will be passed to the virtual machine
+
+
     def resetAvail(self):
         self.avail.hardReset()
 
@@ -19,7 +22,10 @@ class Quadruples:
     # Types stack
     typeStack = deque()
     # cube = semanticCube()  # Should we create the object here (?)
-    pQuadruples = deque()
+    quadList = []
+
+    # Instruction Pointer
+    ip = 1
 
     def pushOperandType(self, operand, opType):
         self.operandStack.append(operand)
@@ -30,9 +36,9 @@ class Quadruples:
 
     def createQuadruple(self, operator, left_operand=None, right_operand=None, temp=None):
         quadruple = (operator, left_operand, right_operand, temp)
-        self.pQuadruples.append(quadruple)
-        print(
-            f'{self.pQuadruples[-1][0]},\t{self.pQuadruples[-1][1]},\t{self.pQuadruples[-1][2]},\t{self.pQuadruples[-1][3]}')
+        self.ip += 1
+        self.quadList.append(quadruple)
+        print(f'{self.ip - 1}) {self.quadList[-1][0]},\t{self.quadList[-1][1]},\t{self.quadList[-1][2]},\t{self.quadList[-1][3]}')
 
     def createIfTopIs(self, operator):
         # If operator stack not empty
