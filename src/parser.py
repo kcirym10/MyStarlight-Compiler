@@ -1,6 +1,13 @@
+import os.path
+import copy
+
 from sly import Parser
 from lexer import StartlightLexer
-import os.path
+from quadruples import Quadruples
+from record import Record
+from symTable import symTable
+from symTableManager import symTableManager
+from virtualMemory import VirtualMemory
 
 
 class StartlightParser(Parser):
@@ -13,10 +20,28 @@ class StartlightParser(Parser):
     # Set of rules for sintaxis
 
     # Program
-    @_('PROGRAM ID ";" opt_vars opt_classes opt_funcs main')
+    @_('PROGRAM np_create_global_symTable ID np_program_record ";" opt_vars opt_classes opt_funcs main')
     def program(self, p):
         print("Successfully compiled uwu")
-        pass
+
+    # Initializes all global variables
+    @_('')
+    def np_create_global_symTable(self, p):
+        #print("Program type")
+        global symMngr
+        symMngr = symTableManager()
+        global record
+        record = Record()
+        global quads
+        quads = Quadruples()
+        global vMem
+        vMem = VirtualMemory()
+        record.setType(record.getProgramType())
+
+    @_('')
+    def np_program_record(self, p):
+        symMngr.insertRecord(p[-1], record.returnRecord())
+        record.clearCurrentRecord()
 
     @_('vars', 'eps')
     def opt_vars(self, p):
@@ -31,9 +56,30 @@ class StartlightParser(Parser):
         pass
 
     # Vars
-    @_('VAR var_type')
+    @_('VAR np_create_var_table var_type')
     def vars(self, p):
         pass
+
+    @_('')
+    def np_create_var_table(self, p):
+        if symMngr.canPushOrPop:
+            # 1 Check if current table already has a vars table
+            if not symMngr[-1].hasVarTable():
+                record.setType("Var Table")
+                # TODO: Need parent ref
+                record.setChildRef(symMngr.getNewSymTable())
+                symMngr.insertRecord('VARS', record.returnRecord())
+                record.clearCurrentRecord()
+            # else:
+            #     # What to do when table already exists?
+            #     # Created at function parameters
+            #     print(":)")
+
+    @_('')
+    def np_exit_scope(self, p):
+        vMem.resetLocal()
+        quads.resetAvail()
+        symMngr.popRecord()
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
     def var_type(self, p):
@@ -43,19 +89,42 @@ class StartlightParser(Parser):
     def more_var_types(self, p):
         pass
 
-    @_("type ID moreids")
+    @_("type ID np_save_id moreids")
     def simple(self, p):
         pass
 
-    @_('"," ID moreids', 'eps')
+    # Sets current type to each record and inserts it in current vars table
+    @_('')
+    def np_save_id(self, p):
+        if symMngr.canPushOrPop:
+            if symMngr.isVarKeyDeclared(p[-1]):
+                record.setType(symMngr.getCurrentType())
+                if str.islower(symMngr.getCurrentType()):
+                    if len(symMngr) == 1:
+                        memAddress = vMem.nextGlobal(symMngr.getCurrentType())
+                    else:
+                        memAddress = vMem.nextLocal(symMngr.getCurrentType())
+                    record.setMemoryAdress(memAddress)
+                symMngr.insertVarRecord(p[-1], record.returnRecord())
+                record.clearCurrentRecord()
+            else:
+                print(f"Multiple declaration of key: \"{p[-1]}\"")
+
+    @_('"," ID np_save_id moreids', 'eps')
     def moreids(self, p):
         pass
 
-    @_('CLASS_ID ID moreids', 'type ID "[" CTE_INT two_dim "]" more_arr_ids')
+    @_('CLASS_ID np_class_id ID np_save_id moreids', 'type ID "[" CTE_INT two_dim "]" more_arr_ids')
     def compound(self, p):
         pass
 
-    @_('"," ID "[" CTE_INT two_dim "]" more_arr_ids', 'eps')
+    @_('')
+    def np_class_id(self, p):
+        if symMngr.canPushOrPop:
+            # TODO Check if class_id defined in semantic cube
+            symMngr.setCurrentType(p[-1])
+
+    @_('"," ID np_save_id "[" CTE_INT two_dim "]" more_arr_ids', 'eps')
     def more_arr_ids(self, p):
         pass
 
@@ -64,13 +133,34 @@ class StartlightParser(Parser):
         pass
 
     # Classes
-    @_('CLASS CLASS_ID opt_derivation "{" opt_vars opt_methods "}" classes', 'eps')
+    @_('CLASS np_prepare_class CLASS_ID np_save_func_id opt_derivation "{" opt_vars opt_methods "}" np_exit_scope classes', 'eps')
     def classes(self, p):
         pass
 
-    @_('DERIVES CLASS_ID', 'eps')
+    @_('')
+    def np_prepare_class(self, p):
+        symMngr.setCurrentType(record.getClassType())
+
+    @_('DERIVES CLASS_ID np_copy_class_record', 'eps')
     def opt_derivation(self, p):
         pass
+
+    @_('')
+    def np_copy_class_record(self, p):
+        if symMngr.canPushOrPop:
+            if len(symMngr) > 1:
+                classRecord = symMngr[-2].getFuncRecord(p[-1])
+                if classRecord:
+
+                    # Need to create copy of contents into a new symTable object
+                    # deepcopy from the copy module creates a new object and copies all of the children from the
+                    # original object. These will not be modified in any changes.
+                    # Gets pointer to record
+                    symMngr[-2][p[-4]] = copy.deepcopy(classRecord)
+                    symMngr.pop()
+                    symMngr.pushTable(symMngr[-1][p[-4]]['childRef'])
+                else:
+                    print("Undefined class derivation")
 
     @_('methods', 'eps')
     def opt_methods(self, p):
@@ -86,13 +176,28 @@ class StartlightParser(Parser):
     def functions(self, p):
         pass
 
-    @_('FUNC func_types ID "(" opt_param ")" opt_vars "{" body "}" functions')
+    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" np_exit_scope functions')
     def function(self, p):
         pass
 
+    @_('')
+    def np_save_func_id(self, p):
+        if symMngr.canPushOrPop:
+            if symMngr.isKeyDeclared(p[-1]):
+                record.setType(symMngr.getCurrentType())
+                record.setChildRef(symMngr.getNewSymTable())
+                symMngr.insertRecord(p[-1], record.returnRecord())
+                symMngr.pushTable(record.getChildRef())
+                record.clearCurrentRecord()
+            else:
+                symMngr.canPushOrPop = False
+                print(f"Multiple declaration of key: \"{p[-1]}\"")
+
+    # Set current type in symMngr to void
     @_('type', 'VOID')
     def func_types(self, p):
-        pass
+        if (p[-1] == "void"):
+            symMngr.setCurrentType(p[-1])
 
     @_('param moreparams', 'eps')
     def opt_param(self, p):
@@ -103,14 +208,15 @@ class StartlightParser(Parser):
         pass
 
     # Param
-    @_('type ID')
+    @_('type ID np_save_id')
     def param(self, p):
         pass
 
     # Type
     @_('INT', 'FLOAT', 'CHAR')
     def type(self, p):
-        pass
+        if symMngr.canPushOrPop:
+            symMngr.setCurrentType(p[-1])  # sets the symMngr's current type
 
     # Body
     @_('opt_stmts')
@@ -131,32 +237,59 @@ class StartlightParser(Parser):
     def print(self, p):
         pass
 
-    @_('CTE_STRING more_args', 'expression more_args')
+    @_('CTE_STRING np_create_print_quad more_args', 'expression np_create_print_quad more_args')
     def p_args(self, p):
         pass
+
+    @_('')
+    def np_create_print_quad(self, p):
+        if symMngr.canPushOrPop:
+            quads.createPRQuad(p[-1], True)
 
     @_('"," p_args', 'eps')
     def more_args(self, p):
         pass
 
     # Read Statement
-    @_('READ "(" variable ")" ";"')
+    @_('READ "(" variable np_create_read_quad ")" ";"')
     def read(self, p):
         pass
 
+    @_('')
+    def np_create_read_quad(self, p):
+        if symMngr.canPushOrPop:
+            quads.createPRQuad(p[-1], False)
+
     # Assign Statement
-    @_('variable "=" expression ";"')
+    @_('variable "=" np_push_operator expression ";" np_check_assignment_operator')
     def assign(self, p):
         pass
 
+    @_('')
+    def np_check_assignment_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("="))
+
     # Conditional Statement
-    @_('IF "(" expression ")" "{" body "}" opt_else')
+    @_('IF "(" expression ")" np_if "{" body "}" opt_else np_end_if')
     def conditional(self, p):
         pass
 
-    @_('ELSE "{" body "}"', 'eps')
+    @_('')
+    def np_if(self, p): # Implement if NP 1
+        quads.createGotoF()
+
+    @_('')
+    def np_end_if(self, p):
+        quads.fillGotos()
+
+    @_('ELSE np_else "{" body "}"', 'eps')
     def opt_else(self, p):
         pass
+    
+    @_('')
+    def np_else(self, p):
+        quads.createGoto()
 
     # Cycles Statement
     @_('for_loop', 'while_loop')
@@ -167,9 +300,21 @@ class StartlightParser(Parser):
     def for_loop(self, p):
         pass
 
-    @_('WHILE "(" expression ")" "{" body "}"')
+    @_('WHILE np_cycle_start "(" expression ")" np_while "{" body "}" np_while_return')
     def while_loop(self, p):
         pass
+
+    @_('')
+    def np_cycle_start(self, p):
+        quads.addJump()
+
+    @_('')
+    def np_while(self, p):
+        quads.createGotoF()
+
+    @_('')
+    def np_while_return(self, p):
+        quads.createGoto()
 
     # Call Func Statement
     @_('call_func_body ";"')
@@ -198,9 +343,25 @@ class StartlightParser(Parser):
         pass
 
     # Variable
-    @_('ID opt_class_func opt_arr_call')
+    @_('ID  opt_class_func opt_arr_call np_push_var_operand')
     def variable(self, p):
         pass
+
+    # If any of the two previous rules returns something then
+    # the a normal variable is not added
+    @_('')
+    def np_push_var_operand(self, p):
+        if symMngr.canPushOrPop:
+            if p[-2] == None and p[-1] == None:
+                # If the variable is declared then we can add it
+                operand = p[-3]
+                record = symMngr.searchAtomic(operand)
+                if record:
+                    #print(operand, ' ', record['address'])
+                    #quads.pushOperandType(operand, record['type'])
+                    quads.pushOperandType(record["address"], record['type'])
+                else:
+                    print(f"Key: \"{p[-3]}\" is not defined")
 
     @_(' "[" expression opt_dim_call "]"', 'eps')
     def opt_arr_call(self, p):
@@ -211,64 +372,147 @@ class StartlightParser(Parser):
         pass
 
     # Expression (OR)
-    @_('t_exp exp_or')
+    @_('t_exp np_check_or_operator exp_or')
     def expression(self, p):
         pass
 
-    @_('"|" expression', 'eps')
+    @_('')
+    def np_check_or_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("|"))
+
+    @_('"|" np_push_operator expression', 'eps')
     def exp_or(self, p):
         pass
 
+    @_('')
+    def np_push_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.pushOperator(p[-1])
+
+    # Passes tuple of or operators to compare
+    @_('')
+    def np_push_or_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("|"))
+
     # T_EXP (AND)
-    @_('g_exp t_and')
+    @_('g_exp np_check_and_operator t_and')
     def t_exp(self, p):
         pass
 
-    @_('"&" t_exp', 'eps')
+    @_('')
+    def np_check_and_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("&"))
+
+    @_('"&" np_push_operator t_exp', 'eps')
     def t_and(self, p):
         pass
 
     # G_EXP
-    @_('m_exp g_exp_opers')
+    @_('m_exp np_check_g_operator g_exp_opers')
     def g_exp(self, p):
         pass
 
-    @_('"<" m_exp', '">" m_exp', 'GREATER_OR_EQUAL_TO m_exp', 'LESS_OR_EQUAL_TO m_exp', 'NOT_EQUAL_TO m_exp', 'EQUAL_TO m_exp', 'eps')
+    # Passes tuple of g operators to compare
+    @_('')
+    def np_check_g_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("<", ">", ">=", "<=", "!=", "=="))
+
+    @_('"<" np_push_operator g_exp', '">" np_push_operator g_exp', 'GREATER_OR_EQUAL_TO np_push_operator g_exp',
+        'LESS_OR_EQUAL_TO np_push_operator g_exp', 'NOT_EQUAL_TO np_push_operator g_exp', 'EQUAL_TO np_push_operator g_exp', 'eps')
     def g_exp_opers(self, p):
         pass
 
     # M_EXP (sum and rest)
-    @_('t m_opers')
+    @_('t np_check_m_operator m_opers')
     def m_exp(self, p):
         pass
 
-    @_('"+" m_exp', '"-" m_exp', 'eps')
+    # Passes tuple of m operators to compare
+    @_('')
+    def np_check_m_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(("+", "-"))
+
+    @_('"+" np_push_operator m_exp', '"-" np_push_operator m_exp', 'eps')
     def m_opers(self, p):
         pass
 
     # T (multuplication and division)
-    @_('f t_opers')
+    @_('f np_check_t_operator t_opers')
     def t(self, p):
         pass
 
-    @_('"*" t', '"/" t', 'eps')
+    # Passes tuple of t operators to compare
+    @_('')
+    def np_check_t_operator(self, p):
+        if symMngr.canPushOrPop:
+            quads.createIfTopIs(('*', '/'))
+        pass
+
+    @_('"*" np_push_operator t', '"/" np_push_operator t', 'eps')
     def t_opers(self, p):
         pass
 
     # F
-    @_('"(" expression ")"', 'variable', 'call_func_body', 'var_cte')
+    @_('"(" np_add_fake_bottom expression ")" np_rem_fake_bottom', 'variable', 'call_func_body', 'var_cte')
     def f(self, p):
         pass
 
+    @_('')
+    def np_add_fake_bottom(self, p):
+        if symMngr.canPushOrPop:
+            quads.pushOperator('(')
+
+    @_('')
+    def np_rem_fake_bottom(self, p):
+        if symMngr.canPushOrPop:
+            if quads.operatorStack[-1] == '(':
+                quads.operatorStack.pop()
+
     # Var_cte integer, float, char, string
-    @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR', 'CTE_STRING')
+    @_('CTE_INT', 'CTE_FLOAT', 'CTE_CHAR')
     def var_cte(self, p):
-        pass
+        if symMngr.canPushOrPop:
+            # If no global variable table
+            if not symMngr[0].hasVarTable():
+                record.setType("Var Table")
+                # TODO: Need parent ref
+                record.setChildRef(symMngr.getNewSymTable())
+                symMngr[0].saveRecord('VARS', record.returnRecord())
+                record.clearCurrentRecord()
+
+            searchRes = symMngr.searchAtomic(str(p[-1]))
+            # Gets the data type from the constant token
+            cteType = str(type(p[-1]).__name__)
+            if searchRes == None:
+                memAddress = vMem.nextConstant(cteType)
+                symMngr[0]['VARS']['childRef'][str(p[-1])] = memAddress
+            else:
+                memAddress = searchRes
+                #print("Value: ", p[-1], " Address: ", searchRes)
+
+            # Insert into quadruples
+            quads.pushOperandType(memAddress, cteType)
 
     # Main
-    @_('MAIN "(" ")" opt_vars "{" body "}"')
+
+    @_('MAIN np_save_main_id "(" ")" opt_vars "{" body "}" np_exit_scope')
     def main(self, p):
         pass
+
+    @_('')
+    def np_save_main_id(self, p):
+        if symMngr.canPushOrPop:
+            record.setType(record.getMainType())
+            #print(record.currentRecord["type"], "\n\n")
+            record.setChildRef(symMngr.getNewSymTable())
+            symMngr.insertRecord(p[-1], record.returnRecord())
+            symMngr.pushTable(record.getChildRef())
+            record.clearCurrentRecord()
 
     # Epsilon, describes an empty production
 
@@ -295,6 +539,11 @@ if __name__ == '__main__':
             s += s1
 
         result = parser.parse(lexer.tokenize(s))
-        print(result)
+        # print(result)
+        # print(symMngr)
+        print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
+        print(quads.operandStack)
+        print(quads.typeStack)
+        print(quads)
     except EOFError:
         print("Error" + EOFError)

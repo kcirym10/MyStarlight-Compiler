@@ -23,7 +23,9 @@ class StartlightLexer(Lexer):
     # Ignore rule for spaces
     ignore = ' \t'
     # Ignoring other patterns
-    ignore_newline = r'\n+'
+    @_(r'\n+')
+    def ignore_newline(self, t):
+        self.lineno += len(t.value)
 
     # Constant char matching
     CTE_CHAR = r"'\w'"
