@@ -51,6 +51,8 @@ MyStarlight's documentation can be found [insert link here]
   - Fixed bugs in semantic cube
   - Fixed bug which saved constants by their numeric value which meant floats and ints shared the same address
 
+- Week 6:
+  - Began implementing functions 
   
 ---
 ### 🤖 Authors
