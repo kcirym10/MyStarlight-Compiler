@@ -1,3 +1,4 @@
+from distutils.log import error
 import os.path
 import copy
 
@@ -8,7 +9,7 @@ from record import Record
 from symTable import symTable
 from symTableManager import symTableManager
 from virtualMemory import VirtualMemory
-
+from helper import errorList
 
 class StartlightParser(Parser):
 
@@ -109,6 +110,7 @@ class StartlightParser(Parser):
                 record.clearCurrentRecord()
             else:
                 print(f"Multiple declaration of key: \"{p[-1]}\"")
+                errorList.append(f"Multiple declaration of key: \"{p[-1]}\"")
 
     @_('"," ID np_save_id moreids', 'eps')
     def moreids(self, p):
@@ -161,6 +163,7 @@ class StartlightParser(Parser):
                     symMngr.pushTable(symMngr[-1][p[-4]]['childRef'])
                 else:
                     print("Undefined class derivation")
+                    errorList.append("Undefined class derivation")
 
     @_('methods', 'eps')
     def opt_methods(self, p):
@@ -192,6 +195,7 @@ class StartlightParser(Parser):
             else:
                 symMngr.canPushOrPop = False
                 print(f"Multiple declaration of key: \"{p[-1]}\"")
+                errorList.append(f"Multiple declaration of key: \"{p[-1]}\"")
 
     # Set current type in symMngr to void
     @_('type', 'VOID')
@@ -306,15 +310,18 @@ class StartlightParser(Parser):
 
     @_('')
     def np_cycle_start(self, p):
-        quads.addJump()
+        if symMngr.canPushOrPop:
+            quads.addJump()
 
     @_('')
     def np_while(self, p):
-        quads.createGotoF()
+        if symMngr.canPushOrPop:
+            quads.createGotoF()
 
     @_('')
     def np_while_return(self, p):
-        quads.createGoto()
+        if symMngr.canPushOrPop:
+            quads.createGoto()
 
     # Call Func Statement
     @_('call_func_body ";"')
@@ -362,6 +369,7 @@ class StartlightParser(Parser):
                     quads.pushOperandType(record["address"], record['type'])
                 else:
                     print(f"Key: \"{p[-3]}\" is not defined")
+                    errorList.append(f"Key: \"{p[-3]}\" is not defined")
 
     @_(' "[" expression opt_dim_call "]"', 'eps')
     def opt_arr_call(self, p):
@@ -469,7 +477,7 @@ class StartlightParser(Parser):
 
     @_('')
     def np_rem_fake_bottom(self, p):
-        if symMngr.canPushOrPop:
+        if symMngr.canPushOrPop and len(errorList) == 0:
             if quads.operatorStack[-1] == '(':
                 quads.operatorStack.pop()
 

@@ -1,4 +1,5 @@
 from typing import Dict
+from helper import errorList
 
 
 '''
@@ -49,6 +50,7 @@ class symTable(Dict):
             return True
         else:
             print(f"Multiple declaration of var key: \"{key}\"")
+            errorList.append(f"Multiple declaration of var key: \"{key}\"")
             return False
 
     # Search function for the parent tree
