@@ -55,7 +55,9 @@ class symTable(Dict):
 
     # Search function for the parent tree
     def searchKey(self, key):
-        return self.search(key, self)
+        if self.hasVarTable() and not self.varKeyNotExists(key):
+            return self.getVarRecord(key)
+        return self.search(key, self.parentRef)
     
     def search(self, key, table):
         if table: 
