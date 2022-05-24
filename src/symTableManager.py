@@ -24,8 +24,8 @@ class symTableManager(List):
         return self.currentType
 
     # Returns a new table to be used either as a new scope or a new variables table
-    def getNewSymTable(self):
-        newSymTable = symTable(self[-1])
+    def getNewSymTable(self, parentName = ""):
+        newSymTable = symTable(self[-1], parentName)
         return newSymTable
 
     # Checks if variable is declared

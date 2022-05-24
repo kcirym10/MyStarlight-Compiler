@@ -9,8 +9,9 @@ from helper import errorList
 '''
 class symTable(Dict):
     scopeLevel = 0 # Class attribute might change
-    def __init__(self, parentRef = None, is_varTable = False):
+    def __init__(self, parentRef = None, parentName = ""):
         self.parentRef = parentRef # Allows for searches into the parent tree
+        self.parentName = parentName
     
     def hasVarTable(self):
         if 'VARS' in self:
