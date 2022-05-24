@@ -39,7 +39,7 @@ class StartlightParser(Parser):
         vMem = VirtualMemory()
         record.setType(record.getProgramType())
         # Create first quad GOTO Main
-        #quads.createGotoMain()
+        quads.createGotoMain()
 
     @_('')
     def np_program_record(self, p):
@@ -539,7 +539,7 @@ class StartlightParser(Parser):
             record.clearCurrentRecord()
 
             # Fill quad goto main
-            #quads.fillGotos()
+            quads.fillGotos()
 
     # Epsilon, describes an empty production
 
