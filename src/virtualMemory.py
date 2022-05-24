@@ -14,13 +14,12 @@ memoryArchitecture = {
     "TS" : { # Temporary Segment
         "int" : 24000,
         "float" : 29000,
-        "char" : 34000,
-        "bool" : 36000
+        "bool" : 34000
     },
     "CS" : { # Constant Segment
-        "int" : 40000,
-        "float" : 45000,
-        "char" : 50000
+        "int" : 36000,
+        "float" : 41000,
+        "char" : 46000
     }
 }
 
@@ -67,7 +66,7 @@ class VirtualMemory:
         return [
                     mts["int"] - mats["int"],
                     mts["float"] - mats["float"],
-                    mts["char"] - mats["char"]
+                    mts["bool"] - mats["bool"]
                 ]
 
     def nextConstant(self, addressType):
