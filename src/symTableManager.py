@@ -16,11 +16,11 @@ class symTableManager(List):
         self.pushTable(symTable())
 
     def setFunctionSize(self, locals, temps):
-        print(self[-1].parentRef[self[-1].parentName]['size'])
-        print(locals)
-        print(temps)
+        # print(self[-1].parentRef[self[-1].parentName]['size'])
+        # print(locals)
+        # print(temps)
         self[-1].parentRef[self[-1].parentName]['size'] = localSize = [locals, temps]
-        print(self[-1].parentRef[self[-1].parentName]['size'])
+        #print(self[-1].parentRef[self[-1].parentName]['size'])
 
     # Sets current type in case needed xD
     def setCurrentType(self, type):
