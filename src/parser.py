@@ -191,7 +191,8 @@ class StartlightParser(Parser):
             if symMngr.isKeyDeclared(p[-1]):
                 record.setType(symMngr.getCurrentType())
                 record.setQuadNumber(quads.ip)
-                record.setChildRef(symMngr.getNewSymTable())
+                record.setSizeStruct()
+                record.setChildRef(symMngr.getNewSymTable(p[-1]))
                 symMngr.insertRecord(p[-1], record.returnRecord())
                 symMngr.pushTable(record.getChildRef())
                 record.clearCurrentRecord()
@@ -203,7 +204,13 @@ class StartlightParser(Parser):
 
     @_('')
     def np_endfunc(self, p):
+        print(symMngr[-1].parentName)
+        #print(symMngr[-1].parentRef[symMngr[-1].parentName]['size'])
+        # Save the size of the current function scope to its size parameter
+        symMngr.setFunctionSize(vMem.getLocalSize(), quads.avail.getTempSize())
+        # Create ENDFUNC Quadruple
         quads.createEndFunc()
+        # Delete vars table from current scope
         symMngr[-1].pop('VARS')
 
     # Set current type in symMngr to void
@@ -229,7 +236,6 @@ class StartlightParser(Parser):
     @_('')
     def np_save_param(self, p):
         symMngr[-1].addToSignature(symMngr.currentType)
-        print(p[-2])
 
     # Type
     @_('INT', 'FLOAT', 'CHAR')
