@@ -4,13 +4,13 @@ from distutils.log import error
 from re import I
 
 from semanticCube import AtomicType, semantics
-from avail import Avail
+from virtualMemory import VirtualMemory
 from helper import errorList
 
 
 class Quadruples:
     # Temporary Address Manager
-    avail = Avail()
+    avail = VirtualMemory()
 
     # List of codes that will be passed to the virtual machine and used in quadruples
     quadCodes = {
@@ -23,7 +23,7 @@ class Quadruples:
     }
 
     def resetAvail(self):
-        self.avail.hardReset()
+        self.avail.resetAvail()
 
     # Operators stack
     operatorStack = deque()
@@ -85,7 +85,7 @@ class Quadruples:
                                 oper, right_operand, None, left_operand)
                         else:
                             # Assign a memory space to temp
-                            temp = self.avail.next(tempType)
+                            temp = self.avail.nextAvail(tempType)
                             self.createQuadruple(
                                 oper, left_operand, right_operand, temp)
                             # Add the temporal variable to the Operands stack

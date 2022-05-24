@@ -4,26 +4,23 @@ memoryArchitecture = {
     "GS" : { # Global Segment
         "int" : 0,
         "float" : 5000,
-        "char" : 10000,
-        "bool" : 12000
+        "char" : 10000
     },
     "LS" : { # Local Segment
-        "int" : 13000,
-        "float" : 18000,
-        "char" : 23000,
-        "bool" : 25000
+        "int" : 12000,
+        "float" : 17000,
+        "char" : 22000
     },
     "TS" : { # Temporary Segment
-        "int" : 27000,
-        "float" : 32000,
-        "char" : 37000,
-        "bool" : 39000
+        "int" : 24000,
+        "float" : 29000,
+        "char" : 34000,
+        "bool" : 36000
     },
     "CS" : { # Constant Segment
-        "int" : 41000,
-        "float" : 46000,
-        "char" : 51000,
-        "bool" : 53000
+        "int" : 40000,
+        "float" : 45000,
+        "char" : 50000
     }
 }
 
@@ -45,13 +42,13 @@ class VirtualMemory:
     def resetLocal(self):
         self.memory["LS"] = copy.deepcopy(memoryArchitecture["LS"])
 
-    # def resetTemporary(self):
-    #     self.memory["TS"] = dict(memoryArchitecture["TS"])
+    def resetAvail(self):
+        self.memory["TS"] = dict(memoryArchitecture["TS"])
 
-    # def nextAvail(self, addressType):
-    #     address = self.memory["TS"][addressType]
-    #     self.memory["TS"][addressType] += 1
-    #     return address
+    def nextAvail(self, addressType):
+        address = self.memory["TS"][addressType]
+        self.memory["TS"][addressType] += 1
+        return address
 
     def nextConstant(self, addressType):
         address = self.memory["CS"][addressType]
