@@ -9,7 +9,7 @@ class programTypes(str, Enum):
 class Record:
     def __init__(self):
         # has the current parameters of the record
-        self.currentRecord = {'type': None, 'childRef': None}
+        self.currentRecord = {}
 
     def setType(self, type):
         self.currentRecord['type'] = type
@@ -27,7 +27,7 @@ class Record:
         return self.currentRecord['childRef']
 
     def clearCurrentRecord(self):
-        self.currentRecord = {'type': None, 'address': None, 'childRef': None}
+        self.currentRecord = {}
 
     def returnRecord(self):
         return self.currentRecord
