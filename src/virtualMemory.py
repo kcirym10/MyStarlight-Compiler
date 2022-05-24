@@ -50,6 +50,26 @@ class VirtualMemory:
         self.memory["TS"][addressType] += 1
         return address
 
+    # Returns the local count variables that were used in a list
+    def getLocalSize(self):
+        mls = self.memory["LS"]
+        mals = memoryArchitecture["LS"]
+        return [
+                    mls["int"] - mals["int"],
+                    mls["float"] - mals["float"],
+                    mls["char"] - mals["char"]
+                ]
+
+    # Returns the local count of temporals that were used in a list
+    def getTempSize(self):
+        mts = self.memory["TS"]
+        mats = memoryArchitecture["TS"]
+        return [
+                    mts["int"] - mats["int"],
+                    mts["float"] - mats["float"],
+                    mts["char"] - mats["char"]
+                ]
+
     def nextConstant(self, addressType):
         address = self.memory["CS"][addressType]
         self.memory["CS"][addressType] += 1
