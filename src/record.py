@@ -17,6 +17,9 @@ class Record:
     def setMemoryAdress(self, address):
         self.currentRecord['address'] = address
 
+    def setQuadNumber(self, quadNum):
+        self.currentRecord['quadNum'] = quadNum
+
     def setChildRef(self, childRef):
         self.currentRecord['childRef'] = childRef
 

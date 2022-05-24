@@ -188,6 +188,7 @@ class StartlightParser(Parser):
         if symMngr.canPushOrPop:
             if symMngr.isKeyDeclared(p[-1]):
                 record.setType(symMngr.getCurrentType())
+                record.setQuadNumber(quads.ip)
                 record.setChildRef(symMngr.getNewSymTable())
                 symMngr.insertRecord(p[-1], record.returnRecord())
                 symMngr.pushTable(record.getChildRef())
