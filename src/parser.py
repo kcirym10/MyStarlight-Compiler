@@ -356,19 +356,32 @@ class StartlightParser(Parser):
     def call_func(self, p):
         pass
 
-    @_('ID opt_class_func np_func_call "(" opt_call_params ")" ')
+    @_('ID opt_class_func np_func_call "(" np_func_ERA opt_call_params ")" ')
     def call_func_body(self, p):
         pass
 
-    @_('')
-    def np_func_call(self, p):
-        if symMngr.isKeyDeclared(p[-2]):
-            print(p[-2])
-            print("YES")
-
     @_(' "." ID', 'eps')
     def opt_class_func(self, p):
-        pass
+        if p[0] == ".":
+            return 1
+
+    # If the function id does not exist we generate an error
+    @_('')
+    def np_func_call(self, p):
+        if symMngr.canPushOrPop:
+            if p[-1] is None:
+                if not symMngr.isFuncDeclared(p[-2]):
+                    errorList.append(f"Undefined function call id: {p[-2]}")
+                    print(f"Undefined function call id: {p[-2]}")
+            #     print("FUNCTION CALL ", p[-2])
+            # else:
+            #     print("CLASS FUNCTION CALL")
+
+    @_('')
+    def np_func_ERA(self, p):
+        if symMngr.canPushOrPop:
+            #if p[-3] is 
+            pass
 
     @_('expression more_expressions', 'eps')
     def opt_call_params(self, p):

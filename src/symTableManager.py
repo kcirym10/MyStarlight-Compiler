@@ -47,6 +47,12 @@ class symTableManager(List):
             return False
         return True
 
+    # Searches for function ID on function calls
+    def isFuncDeclared(self, key):
+        if self[0].keyNotExists(key):
+            return False
+        return True
+
     # Search for atomic record (function or variable)
     def searchAtomic(self, key):
         return self[-1].searchKey(key)
