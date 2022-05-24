@@ -114,16 +114,20 @@ class Quadruples:
                 self.typeStack.pop()
                 self.createQuadruple(code, None, None, exprValue)
 
+    # Modifies the actual structure holding the goto destination
     def fill(self, quadNum, destination):
         if len(errorList) == 0:
             self.quadList[quadNum][3] = destination
             print(self.quadList[quadNum])
 
+    # Fills the goto at the jumpStack's quadNum
     def fillGotos(self):
         if len(errorList) == 0:
             quadNum = self.jumpStack.pop()
             self.fill(quadNum, self.ip)
 
+    # Creates a gotoF for regular working expressions such as ifs and whiles
+    # Note: does not work for a traditional do-while
     def createGotoF(self):  
         if len(errorList) == 0:
             tempType = self.typeStack.pop()
@@ -135,12 +139,29 @@ class Quadruples:
                 print("ERROR: Expected bool result")
                 errorList.append("ERROR: Expected bool result")
 
+    # Creates first goto quadruple and saves the quadNum to the jumpStack
+    def createGotoMain(self):
+        if len(errorList) == 0:
+            self.createQuadruple(self.quadCodes['go'], None, None, None)
+            self.jumpStack.append(self.ip - 1)
+
+    # Creates a goto for an if statement which saves its quadNum for when the else part ends
     def createGoto(self):
         if len(errorList) == 0:
             self.createQuadruple(self.quadCodes['go'])
             quadNum = self.jumpStack.pop()
             self.jumpStack.append(self.ip - 1)
-            self.fill(quadNum, self.ip)   
+            self.fill(quadNum, self.ip)
+
+    # The while goto fills the gotoF, then fills the newly generated goto which returns to the while expression
+    def createWhileGoto(self):
+        if len(errorList) == 0:
+            self.createQuadruple(self.quadCodes['go'])
+            quadNum = self.jumpStack.pop()
+            self.fill(quadNum, self.ip)
+            quadNum = self.ip - 1
+            dest = self.jumpStack.pop()
+            self.fill(quadNum, dest)
 
     def addJump(self):
         if len(errorList) == 0:

@@ -38,6 +38,8 @@ class StartlightParser(Parser):
         global vMem
         vMem = VirtualMemory()
         record.setType(record.getProgramType())
+        # Create first quad GOTO Main
+        #quads.createGotoMain()
 
     @_('')
     def np_program_record(self, p):
@@ -329,7 +331,7 @@ class StartlightParser(Parser):
     @_('')
     def np_while_return(self, p):
         if symMngr.canPushOrPop:
-            quads.createGoto()
+            quads.createWhileGoto()
 
     # Call Func Statement
     @_('call_func_body ";"')
@@ -536,6 +538,9 @@ class StartlightParser(Parser):
             symMngr.pushTable(record.getChildRef())
             record.clearCurrentRecord()
 
+            # Fill quad goto main
+            #quads.fillGotos()
+
     # Epsilon, describes an empty production
 
     @_('')
@@ -566,6 +571,7 @@ if __name__ == '__main__':
         print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
         print(quads.operandStack)
         print(quads.typeStack)
+        print(quads.jumpStack)
         print(quads)
     except EOFError:
         print("Error" + EOFError)
