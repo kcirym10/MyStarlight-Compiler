@@ -213,9 +213,15 @@ class StartlightParser(Parser):
         pass
 
     # Param
-    @_('type ID np_save_id moreparams')
+    @_('type ID np_save_id np_save_param moreparams')
     def param(self, p):
         pass
+
+    # Saves the current type of the param to the signature list
+    @_('')
+    def np_save_param(self, p):
+        symMngr[-1].addToSignature(symMngr.currentType)
+        print(p[-2])
 
     # Type
     @_('INT', 'FLOAT', 'CHAR')

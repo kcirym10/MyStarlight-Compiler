@@ -53,6 +53,13 @@ class symTable(Dict):
             errorList.append(f"Multiple declaration of var key: \"{key}\"")
             return False
 
+    # Adds types to function signature
+    def addToSignature(self, paramType):
+        if 'paramSignature' not in self:
+            self['paramSignature'] = [paramType]
+        else:
+            self['paramSignature'].append(paramType)
+
     # Search function for the parent tree
     def searchKey(self, key):
         if self.hasVarTable() and not self.varKeyNotExists(key):
