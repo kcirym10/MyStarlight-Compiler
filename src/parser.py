@@ -265,8 +265,16 @@ class StartlightParser(Parser):
         pass
 
     # Read Statement
-    @_('READ "(" variable np_create_read_quad ")" ";"')
+    @_('READ "(" r_args ")" ";"')
     def read(self, p):
+        pass
+
+    @_('variable np_create_read_quad more_r_args')
+    def r_args(self, p):
+        pass
+
+    @_('"," r_args', 'eps')
+    def more_r_args(self, p):
         pass
 
     @_('')
