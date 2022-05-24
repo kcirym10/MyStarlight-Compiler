@@ -196,6 +196,7 @@ class StartlightParser(Parser):
                 symMngr.canPushOrPop = False
                 print(f"Multiple declaration of key: \"{p[-1]}\"")
                 errorList.append(f"Multiple declaration of key: \"{p[-1]}\"")
+        return
 
     # Set current type in symMngr to void
     @_('type', 'VOID')
@@ -203,7 +204,7 @@ class StartlightParser(Parser):
         if (p[-1] == "void"):
             symMngr.setCurrentType(p[-1])
 
-    @_('param moreparams', 'eps')
+    @_('param', 'eps')
     def opt_param(self, p):
         pass
 
@@ -212,7 +213,7 @@ class StartlightParser(Parser):
         pass
 
     # Param
-    @_('type ID np_save_id')
+    @_('type ID np_save_id moreparams')
     def param(self, p):
         pass
 
@@ -488,9 +489,14 @@ class StartlightParser(Parser):
             # If no global variable table
             if not symMngr[0].hasVarTable():
                 record.setType("Var Table")
-                # TODO: Need parent ref
                 record.setChildRef(symMngr.getNewSymTable())
                 symMngr[0].saveRecord('VARS', record.returnRecord())
+                record.clearCurrentRecord()
+            # Save into constants table
+            if 'CTE' not in symMngr[0]:
+                record.setType('cte')
+                record.setChildRef(symMngr.getNewSymTable())
+                symMngr[0].saveRecord('CTE', record.returnRecord())
                 record.clearCurrentRecord()
 
             searchRes = symMngr.searchAtomic(str(p[-1]))
@@ -499,6 +505,7 @@ class StartlightParser(Parser):
             if searchRes == None:
                 memAddress = vMem.nextConstant(cteType)
                 symMngr[0]['VARS']['childRef'][str(p[-1])] = memAddress
+                symMngr[0]['CTE']['childRef'][str(p[-1])] = memAddress
             else:
                 memAddress = searchRes
                 #print("Value: ", p[-1], " Address: ", searchRes)
@@ -548,7 +555,7 @@ if __name__ == '__main__':
 
         result = parser.parse(lexer.tokenize(s))
         # print(result)
-        # print(symMngr)
+        print(symMngr)
         print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
         print(quads.operandStack)
         print(quads.typeStack)
