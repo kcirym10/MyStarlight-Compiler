@@ -119,7 +119,6 @@ class Quadruples:
     def fill(self, quadNum, destination):
         if len(errorList) == 0:
             self.quadList[quadNum][3] = destination
-            print(self.quadList[quadNum])
 
     # Fills the goto at the jumpStack's quadNum
     def fillGotos(self):
