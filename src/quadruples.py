@@ -18,7 +18,8 @@ class Quadruples:
         'r' : 'READ',
         'goF' : 'GOTOF',
         'goT' : 'GOTOT',
-        'go' : 'GOTO'
+        'go' : 'GOTO',
+        'ef' : 'ENDFUNC'
     }
 
     def resetAvail(self):
@@ -163,9 +164,13 @@ class Quadruples:
             dest = self.jumpStack.pop()
             self.fill(quadNum, dest)
 
+    # Adds current ip to the jumpStack
     def addJump(self):
         if len(errorList) == 0:
             self.jumpStack.append(self.ip) 
+
+    def createEndFunc(self):
+        self.createQuadruple(self.quadCodes['ef'], None, None, None)
 
     def __str__(self):
         if len(errorList) == 0:

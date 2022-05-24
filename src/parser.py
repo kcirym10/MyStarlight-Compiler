@@ -181,7 +181,7 @@ class StartlightParser(Parser):
     def functions(self, p):
         pass
 
-    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" np_exit_scope functions')
+    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" np_endfunc np_exit_scope functions')
     def function(self, p):
         pass
 
@@ -200,6 +200,11 @@ class StartlightParser(Parser):
                 print(f"Multiple declaration of key: \"{p[-1]}\"")
                 errorList.append(f"Multiple declaration of key: \"{p[-1]}\"")
         return
+
+    @_('')
+    def np_endfunc(self, p):
+        quads.createEndFunc()
+        symMngr[-1].pop('VARS')
 
     # Set current type in symMngr to void
     @_('type', 'VOID')
@@ -576,10 +581,10 @@ if __name__ == '__main__':
         result = parser.parse(lexer.tokenize(s))
         # print(result)
         print(symMngr)
-        print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
+        '''print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
         print(quads.operandStack)
         print(quads.typeStack)
-        print(quads.jumpStack)
+        print(quads.jumpStack)'''
         print(quads)
     except EOFError:
         print("Error" + EOFError)
