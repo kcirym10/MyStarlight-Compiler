@@ -19,7 +19,8 @@ class Quadruples:
         'goF' : 'GOTOF',
         'goT' : 'GOTOT',
         'go' : 'GOTO',
-        'ef' : 'ENDFUNC'
+        'ef' : 'ENDFUNC',
+        'era' : 'ERA'
     }
 
     def resetAvail(self):
@@ -171,6 +172,9 @@ class Quadruples:
     def createEndFunc(self):
         self.createQuadruple(self.quadCodes['ef'], None, None, None)
 
+    def createERA(self, size):
+        self.createQuadruple(self.quadCodes['era'], None, None, size)
+
     def __str__(self):
         if len(errorList) == 0:
             columns = 3
@@ -178,7 +182,10 @@ class Quadruples:
             index = 0
             formatted = ''
             for quad in self.quadList:
-                formatted += f'{index})\t{quad[0]}\t{quad[1]}\t{quad[2]}\t{quad[3]}\t\t'
+                if isinstance(quad[3], list):
+                    formatted += f'{index})\t{quad[0]}\t{quad[1]}\t{quad[2]}\t{quad[3]}\t'
+                else:
+                    formatted += f'{index})\t{quad[0]}\t{quad[1]}\t{quad[2]}\t{quad[3]}\t\t\t'
                 index += 1
                 if index % columns == 0:
                     formatted += '\n'

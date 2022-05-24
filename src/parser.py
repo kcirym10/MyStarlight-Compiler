@@ -380,8 +380,9 @@ class StartlightParser(Parser):
     @_('')
     def np_func_ERA(self, p):
         if symMngr.canPushOrPop:
-            #if p[-3] is 
-            pass
+            if len(errorList) == 0:
+                if p[-3] is None:
+                    quads.createERA(symMngr[0][p[-4]]['size'])
 
     @_('expression more_expressions', 'eps')
     def opt_call_params(self, p):
