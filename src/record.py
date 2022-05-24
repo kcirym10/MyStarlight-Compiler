@@ -20,6 +20,11 @@ class Record:
     def setQuadNumber(self, quadNum):
         self.currentRecord['quadNum'] = quadNum
 
+    # Size structure is :  [[local int, local float, local char], 
+    #                       [temp int, temp float, temp bool]]
+    def setSizeStruct(self):
+        self.currentRecord['size'] = [[0, 0, 0], [0, 0, 0]]
+
     def setChildRef(self, childRef):
         self.currentRecord['childRef'] = childRef
 
