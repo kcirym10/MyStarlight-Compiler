@@ -188,7 +188,7 @@ class StartlightParser(Parser):
     @_('')
     def np_save_func_id(self, p):
         if symMngr.canPushOrPop:
-            if symMngr.isKeyDeclared(p[-1]):
+            if not symMngr.isKeyDeclared(p[-1]):
                 record.setType(symMngr.getCurrentType())
                 record.setQuadNumber(quads.ip)
                 record.setSizeStruct()
@@ -204,7 +204,6 @@ class StartlightParser(Parser):
 
     @_('')
     def np_endfunc(self, p):
-        print(symMngr[-1].parentName)
         #print(symMngr[-1].parentRef[symMngr[-1].parentName]['size'])
         # Save the size of the current function scope to its size parameter
         symMngr.setFunctionSize(vMem.getLocalSize(), quads.avail.getTempSize())
@@ -357,9 +356,15 @@ class StartlightParser(Parser):
     def call_func(self, p):
         pass
 
-    @_('ID opt_class_func "(" opt_call_params ")" ')
+    @_('ID opt_class_func np_func_call "(" opt_call_params ")" ')
     def call_func_body(self, p):
         pass
+
+    @_('')
+    def np_func_call(self, p):
+        if symMngr.isKeyDeclared(p[-2]):
+            print(p[-2])
+            print("YES")
 
     @_(' "." ID', 'eps')
     def opt_class_func(self, p):
@@ -587,10 +592,10 @@ if __name__ == '__main__':
         result = parser.parse(lexer.tokenize(s))
         # print(result)
         print(symMngr)
-        '''print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
+        print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
         print(quads.operandStack)
         print(quads.typeStack)
-        print(quads.jumpStack)'''
+        print(quads.jumpStack)
         print(quads)
     except EOFError:
         print("Error" + EOFError)

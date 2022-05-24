@@ -44,8 +44,8 @@ class symTableManager(List):
     # Checks if ID is declared
     def isKeyDeclared(self, key):
         if self[-1].keyNotExists(key):
-            return True
-        return False
+            return False
+        return True
 
     # Search for atomic record (function or variable)
     def searchAtomic(self, key):
