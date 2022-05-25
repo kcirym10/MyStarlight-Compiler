@@ -19,7 +19,7 @@ class symTableManager(List):
         # print(self[-1].parentRef[self[-1].parentName]['size'])
         # print(locals)
         # print(temps)
-        self[-1].parentRef[self[-1].parentName]['size'] = localSize = [locals, temps]
+        self[-1].parentRef[self[-1].parentName]['size'] = [locals, temps]
         #print(self[-1].parentRef[self[-1].parentName]['size'])
 
     # Sets current type in case needed xD
