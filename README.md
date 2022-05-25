@@ -51,7 +51,17 @@ MyStarlight's documentation can be found [insert link here]
   - Fixed bugs in semantic cube
   - Fixed bug which saved constants by their numeric value which meant floats and ints shared the same address
 
-  
+- Week 6:
+  - Began implementing functions 
+
+- Week 7:
+  - Implemented Error-Handling
+  - Created quadruples for function definitions
+  - Created quadruples for function calls
+  - Fixed bugs in VARS Table
+  - Modified records
+
+
 ---
 ### 🤖 Authors
 | Name                   | Student ID |

@@ -20,7 +20,10 @@ class Quadruples:
         'goT' : 'GOTOT',
         'go' : 'GOTO',
         'ef' : 'ENDFUNC',
-        'era' : 'ERA'
+        'era' : 'ERA',
+        'param' : 'PARAM',
+        'goSub' : 'GOSUB',
+        'ep' : 'ENDPROGRAM'
     }
 
     def resetAvail(self):
@@ -40,6 +43,9 @@ class Quadruples:
 
     # Instruction Pointer
     ip = 0
+    # Param Pointer
+    currentSignature = []
+    sigIndex = 0
 
     def pushOperandType(self, operand, opType):
         if len(errorList) == 0:
@@ -170,10 +176,44 @@ class Quadruples:
             self.jumpStack.append(self.ip) 
 
     def createEndFunc(self):
-        self.createQuadruple(self.quadCodes['ef'], None, None, None)
+        if len(errorList) == 0:
+            self.createQuadruple(self.quadCodes['ef'], None, None, None)
 
-    def createERA(self, size):
-        self.createQuadruple(self.quadCodes['era'], None, None, size)
+    def createERA(self, funcSize, funcSig):
+        if len(errorList) == 0:
+            self.createQuadruple(self.quadCodes['era'], None, None, funcSize)
+            # Initialize param pointer to 0 and save current function signature
+            self.sigIndex = 0
+            self.currentSignature = funcSig
+
+    def createParam(self):
+        if len(errorList) == 0:
+            if self.sigIndex < len(self.currentSignature):
+                arg = self.operandStack.pop()
+                argType = self.typeStack.pop()
+                if argType == self.currentSignature[self.sigIndex]:
+                    self.createQuadruple(self.quadCodes['param'], arg, None, self.sigIndex)
+                else:
+                    errorList.append(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex]}")
+                    print(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex]}")
+                
+            # else:
+            #     errorList.append("Too many parameters")
+            #     print("Too many parameters")
+
+            # We increment the counter to receive the next or compare with function signature at the end
+            self.sigIndex += 1
+
+    def createGoSub(self, quadNum):
+        if len(errorList) == 0:
+            # Verify that the signature's index is the correct length
+            if self.sigIndex == len(self.currentSignature):
+                self.createQuadruple(self.quadCodes['goSub'], None, None, quadNum)
+    
+    def createEndProgram(self):
+        if len(errorList) == 0:
+            self.createQuadruple(self.quadCodes['ep'], None, None, None)
+
 
     def __str__(self):
         if len(errorList) == 0:
