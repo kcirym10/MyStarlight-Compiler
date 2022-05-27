@@ -4,6 +4,23 @@ var
     int a, b;
     float f;
 
+class Vehicle {
+    var
+        int speed;
+
+    methods:
+        func void travelTime(int dist){
+            print(dist / speed);
+        }
+}
+
+class Car derives Vehicle{
+    methods:
+        func void travel(int time){
+            print(speed * time);
+        }
+}
+
 func void uno(int a){
     a = a + b * a;
     print(a, b, a + b);
