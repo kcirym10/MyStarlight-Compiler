@@ -1,6 +1,9 @@
+from pydoc import Helper
 import sys
 
 from compiler.parser import parseProgram
+from compiler.helper import structsFromFile
+from vMachine.virtualMahine import virtualMachine
 
 if __name__ == "__main__":
     opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
@@ -12,4 +15,6 @@ if __name__ == "__main__":
     else:
         fileName = args[0]
         parseProgram(fileName)
+        virtualMachine().run()
+        
         
