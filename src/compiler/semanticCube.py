@@ -1,6 +1,6 @@
 from distutils.log import error
 from enum import Enum
-from helper import errorList
+from compiler.helper import errorList
 
 
 class AtomicType(str, Enum):

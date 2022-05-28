@@ -3,13 +3,13 @@ import os.path
 import copy
 
 from sly import Parser
-from lexer import StartlightLexer
-from quadruples import Quadruples
-from record import Record
-from symTable import symTable
-from symTableManager import symTableManager
-from virtualMemory import VirtualMemory
-from helper import errorList
+from compiler.lexer import StartlightLexer
+from compiler.quadruples import Quadruples
+from compiler.record import Record
+from compiler.symTable import symTable
+from compiler.symTableManager import symTableManager
+from compiler.virtualMemory import VirtualMemory
+from compiler.helper import errorList, fileWritter
 
 class StartlightParser(Parser):
 
@@ -629,6 +629,32 @@ class StartlightParser(Parser):
     def eps(self, p):
         pass
 
+def parseProgram(fileName):
+    lexer = StartlightLexer()
+    parser = StartlightParser()
+    print("==PARSER SLY==\n")
+
+    try:
+
+        scriptpath = os.path.dirname(__file__)
+        filename = os.path.join(scriptpath, 'test.txt')
+        f = open(filename)
+        # print(f.read())
+
+        # f = open("test.txt", "r")  # inserta nombre de archivo
+        s = ""
+        for s1 in f:
+            s += s1
+
+        result = parser.parse(lexer.tokenize(s))
+
+        cte = None
+        if 'CTE' in symMngr[0]:
+            cte = symMngr[0]['CTE']['childRef']
+
+        fileWritter(cte, quads)
+    except EOFError:
+        print("Error" + EOFError)
 
 if __name__ == '__main__':
     lexer = StartlightLexer()
@@ -655,5 +681,11 @@ if __name__ == '__main__':
         print(quads.typeStack)
         print(quads.jumpStack)
         print(quads)
+
+        cte = None
+        if 'CTE' in symMngr[0]:
+            cte = symMngr[0]['CTE']['childRef']
+
+        fileWritter(cte, quads)
     except EOFError:
         print("Error" + EOFError)

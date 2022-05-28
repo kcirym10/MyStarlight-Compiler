@@ -1,5 +1,5 @@
 from typing import Dict
-from helper import errorList
+from compiler.helper import errorList
 
 
 '''

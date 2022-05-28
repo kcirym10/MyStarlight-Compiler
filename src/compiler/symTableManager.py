@@ -6,7 +6,7 @@
 '''
 
 from typing import List
-from symTable import symTable
+from compiler.symTable import symTable
 
 class symTableManager(List):
     currentType = None

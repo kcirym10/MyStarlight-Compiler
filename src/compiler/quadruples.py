@@ -3,9 +3,9 @@ from collections import deque
 from distutils.log import error
 from re import I
 
-from semanticCube import AtomicType, semantics
-from virtualMemory import VirtualMemory
-from helper import errorList
+from compiler.semanticCube import AtomicType, semantics
+from compiler.virtualMemory import VirtualMemory
+from compiler.helper import errorList
 
 
 class Quadruples:
