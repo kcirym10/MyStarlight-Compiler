@@ -14,8 +14,8 @@ def constantFormat(constant):
 
 def quadFormat(quad):
     if isinstance(quad[3], list):
-        return(f'{quad[0]}\t{quad[1]}\t{quad[2]}\t{quad[3][0][0]} {quad[3][0][1]} \
-                 {quad[3][0][2]} {quad[3][1][0]} {quad[3][1][1]} {quad[3][1][2]}\n')
+        return(f'{quad[0]}\t{quad[1]}\t{quad[2]}\t{quad[3][0][0]} {quad[3][0][1]} '+
+                 f'{quad[3][0][2]} {quad[3][1][0]} {quad[3][1][1]} {quad[3][1][2]}\n')
     else:
         return(f'{quad[0]}\t{quad[1]}\t{quad[2]}\t{quad[3]}\n')
 
