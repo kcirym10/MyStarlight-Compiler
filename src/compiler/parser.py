@@ -486,12 +486,6 @@ class StartlightParser(Parser):
         if symMngr.canPushOrPop:
             quads.pushOperator(p[-1])
 
-    # Passes tuple of or operators to compare
-    @_('')
-    def np_push_or_operator(self, p):
-        if symMngr.canPushOrPop:
-            quads.createIfTopIs(("|"))
-
     # T_EXP (AND)
     @_('g_exp np_check_and_operator t_and')
     def t_exp(self, p):
