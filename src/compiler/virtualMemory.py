@@ -1,25 +1,48 @@
 import copy
 
+# memoryArchitecture = {
+#     "GS" : { # Global Segment
+#         "int" : 0,
+#         "float" : 5000,
+#         "char" : 10000
+#     },
+#     "LS" : { # Local Segment
+#         "int" : 12000,
+#         "float" : 17000,
+#         "char" : 22000
+#     },
+#     "TS" : { # Temporary Segment
+#         "int" : 24000,
+#         "float" : 29000,
+#         "bool" : 34000
+#     },
+#     "CS" : { # Constant Segment
+#         "int" : 36000,
+#         "float" : 41000,
+#         "char" : 46000
+#     }
+# }
+
 memoryArchitecture = {
     "GS" : { # Global Segment
         "int" : 0,
-        "float" : 5000,
-        "char" : 10000
+        "float" : 2000,
+        "char" : 4000
     },
     "LS" : { # Local Segment
-        "int" : 12000,
-        "float" : 17000,
-        "char" : 22000
+        "int" : 6000,
+        "float" : 8000,
+        "char" : 10000
     },
     "TS" : { # Temporary Segment
-        "int" : 24000,
-        "float" : 29000,
-        "bool" : 34000
+        "int" : 12000,
+        "float" : 14000,
+        "bool" : 16000
     },
     "CS" : { # Constant Segment
-        "int" : 36000,
-        "float" : 41000,
-        "char" : 46000
+        "int" : 18000,
+        "float" : 20000,
+        "char" : 22000
     }
 }
 
