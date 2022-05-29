@@ -3,7 +3,7 @@ import sys
 
 from compiler.parser import parseProgram
 from compiler.helper import structsFromFile
-from vMachine.virtualMahine import virtualMachine
+from vMachine.virtualMachine import virtualMachine
 
 if __name__ == "__main__":
     opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
