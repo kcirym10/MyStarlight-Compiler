@@ -9,7 +9,7 @@ class memory:
     def mapMemory(self, address):
         keyList = list(self.memType.keys())
         for key, value in self.memType.items():
-            print(key," ",keyList.index(key))
+            #print(key," ",keyList.index(key))
             startRange = self.memType[key]
             if int(address) >= startRange and int(address) < startRange + 2000:
                 return self.memory[keyList.index(key)]
@@ -20,7 +20,7 @@ class memory:
     def setValue(self, address, val):
         self.mapMemory(address)[address] = val
 
-        print(self.memory)
+        #print(self.memory)
 
 
 class virtualMachine:
@@ -56,19 +56,23 @@ class virtualMachine:
         ip = 0
         while (self.quadList[ip][0] != "ENDPROGRAM"):
             quad = self.quadList[ip]
-            print(quad)
-            print(ip)
+            #print(quad)
+            #print(ip)
             quadCode = quad[0]
             # Special
             if quadCode == "GOTO":
                 ip = int(quad[3])
                 continue
-            
+            # Reading and Writting
+            elif quadCode == "PRINT":
+                a3 = int(quad[3])
+                #print(self.memSeg(a1))
+                print(self.memSeg(a3).getValue(a3))
             # Expressions
             elif quadCode == "=":
                 a1 = int(quad[1])
                 a3 = int(quad[3])
-                print(self.memSeg(a1))
+                #print(self.memSeg(a1))
                 res = self.memSeg(a1).getValue(a1)
                 self.memSeg(a3).setValue(a3, res)
             elif quadCode == "&":
