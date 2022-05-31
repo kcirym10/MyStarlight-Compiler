@@ -3,9 +3,10 @@ from compiler.helper import structsFromFile
 from compiler.virtualMemory import memoryArchitecture
 
 class memory:
-    def __init__(self, memType):
+    def __init__(self, memType, memSize = 0):
         self.memory = [{}, {}, {}]
         self.memType = memoryArchitecture[memType]
+        self.memSize = memSize
 
     def mapMemory(self, address):
         keyList = list(self.memType.keys())
@@ -39,6 +40,7 @@ class virtualMachine:
         self._tempMemory = [memory("TS")]
         self._constantMemory = memory("CS")
         self.memUsage = 0
+        self.tempContext = None
 
     # The Memory Segment function
     # Returns the appropriate memory to use
@@ -127,6 +129,27 @@ class virtualMachine:
                 if self.memSeg(a1).getValue(a1) == False:
                     ip = int(quad[3])
                     continue
+            # Function
+            elif quadCode == "ERA":
+                itemCount = 0
+                index = 0
+                segSize = [0,0]
+                # Convert the 6 numbers into a list to be processed for the temp and local sizes
+                sizeList = list(quad[3].split(" "))
+                for item in sizeList:
+                        if itemCount == 3:
+                            index = 1
+                        segSize[index] += int(item)
+
+                if self.memUsage + segSize[0] + segSize[1] > self.memLimit:
+                    print("Stack Overflow")
+                    return
+                
+                # Create a temporarily parallel memory context before changing to it
+                self.tempContext = [memory("LS", segSize[0]), memory("TS", segSize[1])]
+                # print(quad[3])
+                # print(f"ERA size = {segSize[0] + segSize[1]}")
+                
             # Reading and Writting
             elif quadCode == "PRINT":
                 a3 = int(quad[3])
