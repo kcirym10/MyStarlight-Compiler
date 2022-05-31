@@ -192,8 +192,9 @@ class Quadruples:
             if self.sigIndex < len(self.currentSignature):
                 arg = self.operandStack.pop()
                 argType = self.typeStack.pop()
-                if argType == self.currentSignature[self.sigIndex]:
-                    self.createQuadruple(self.quadCodes['param'], arg, None, self.sigIndex)
+                currentParam = self.currentSignature[self.sigIndex]
+                if argType == currentParam[0]:
+                    self.createQuadruple(self.quadCodes['param'], arg, None, currentParam[1])
                 else:
                     errorList.append(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex]}")
                     print(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex]}")
