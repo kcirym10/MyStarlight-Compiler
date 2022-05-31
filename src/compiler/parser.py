@@ -253,7 +253,7 @@ class StartlightParser(Parser):
     @_('')
     def np_save_param(self, p):
         if symMngr.canPushOrPop:
-            symMngr[-1].addToSignature(symMngr.currentType)
+            symMngr[-1].addToSignature([symMngr.currentType, symMngr.searchAtomic(p[-2])['address']])
 
     # Type
     @_('INT', 'FLOAT', 'CHAR')
