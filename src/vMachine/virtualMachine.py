@@ -41,11 +41,12 @@ class virtualMachine:
         self._constantMemory = memory("CS")
         self.memUsage = 0
         self.tempContext = None
+        self._jumpStack = []
 
     # The Memory Segment function
     # Returns the appropriate memory to use
     # Based on the range in which an address is located
-    def memSeg(self, address):
+    def memSeg(self, address, ctxt = None):
         if address < 6000:
             return self._globalMemory
         if address < 12000:
@@ -149,7 +150,28 @@ class virtualMachine:
                 self.tempContext = [memory("LS", segSize[0]), memory("TS", segSize[1])]
                 # print(quad[3])
                 # print(f"ERA size = {segSize[0] + segSize[1]}")
-                
+            elif quadCode == "PARAM":
+                # The parameter is saved to the local memory because it is not
+                # an intermediate calculation
+                a1 = int(quad[1])
+                a3 = int(quad[3])
+                self.tempContext[0].setValue(a3, self.memSeg(a1).getValue(a1))
+            elif quadCode == "GOSUB":
+                # Change context
+                self._localMemory.append(self.tempContext[0])
+                self._tempMemory.append(self.tempContext[1])
+                # Save current IP and change the IP
+                self._jumpStack.append(ip)
+                ip = int(quad[3])
+                continue
+            elif quadCode == "ENDFUNC":
+                # Free up memory space
+                self.memUsage -= self._localMemory[-1].memSize + self._tempMemory[-1].memSize
+                # Remove the current context and return to the last ip
+                self._localMemory.pop()
+                self._tempMemory.pop()
+                ip = self._jumpStack[-1]
+                self._jumpStack.pop()
             # Reading and Writting
             elif quadCode == "PRINT":
                 a3 = int(quad[3])
