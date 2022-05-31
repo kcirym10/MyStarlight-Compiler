@@ -437,6 +437,37 @@ class StartlightParser(Parser):
                 symMngr[-1].funcNeedsReturn = False
                 quads.createReturn(symMngr.getReturnType())
 
+                # We create a global vars table if one does not exist
+                if not symMngr[0].hasVarTable():
+                    record.setType("Var Table")
+                    record.setChildRef(symMngr.getNewSymTable())
+                    symMngr[0].saveRecord('VARS', record.returnRecord())
+                    record.clearCurrentRecord()
+                
+                # We obtain the parent record and parent name to get it's information
+                # the name is used in searching, a reference to the global Vars table for
+                # convenience and the parent record for type and address access
+                fName = symMngr[-1].parentName
+                globalVars = symMngr[0]['VARS']['childRef']
+                parentRecord = symMngr[0][fName]
+                returnRecord = None
+                if fName not in globalVars:
+                    fType = parentRecord['type']
+                    memAddress = vMem.nextGlobal(fType)
+                    # Build the record
+                    returnRecord = {'type': fType, 'address': memAddress}
+                    globalVars[fName] = returnRecord
+                else:
+                    returnRecord = globalVars[fName]
+
+                # We can use the return record to help quadruple processing
+                # in this instance we will be creating an assignment quadruple later on
+                # in another NP
+                print(returnRecord)
+                
+            else:
+                errorList.append("Return in void function detected")
+
     # Variable
     @_('ID  opt_class_func opt_arr_call np_push_var_operand')
     def variable(self, p):
