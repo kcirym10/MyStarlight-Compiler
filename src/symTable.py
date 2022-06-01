@@ -1,4 +1,5 @@
 from typing import Dict
+from helper import errorList
 
 
 '''
@@ -8,8 +9,9 @@ from typing import Dict
 '''
 class symTable(Dict):
     scopeLevel = 0 # Class attribute might change
-    def __init__(self, parentRef = None, is_varTable = False):
+    def __init__(self, parentRef = None, parentName = ""):
         self.parentRef = parentRef # Allows for searches into the parent tree
+        self.parentName = parentName
     
     def hasVarTable(self):
         if 'VARS' in self:
@@ -49,11 +51,21 @@ class symTable(Dict):
             return True
         else:
             print(f"Multiple declaration of var key: \"{key}\"")
+            errorList.append(f"Multiple declaration of var key: \"{key}\"")
             return False
+
+    # Adds types to function signature
+    def addToSignature(self, paramType):
+        if 'paramSignature' not in self:
+            self['paramSignature'] = [paramType]
+        else:
+            self['paramSignature'].append(paramType)
 
     # Search function for the parent tree
     def searchKey(self, key):
-        return self.search(key, self)
+        if self.hasVarTable() and not self.varKeyNotExists(key):
+            return self.getVarRecord(key)
+        return self.search(key, self.parentRef)
     
     def search(self, key, table):
         if table: 

@@ -4,26 +4,22 @@ memoryArchitecture = {
     "GS" : { # Global Segment
         "int" : 0,
         "float" : 5000,
-        "char" : 10000,
-        "bool" : 12000
+        "char" : 10000
     },
     "LS" : { # Local Segment
-        "int" : 13000,
-        "float" : 18000,
-        "char" : 23000,
-        "bool" : 25000
+        "int" : 12000,
+        "float" : 17000,
+        "char" : 22000
     },
     "TS" : { # Temporary Segment
-        "int" : 27000,
-        "float" : 32000,
-        "char" : 37000,
-        "bool" : 39000
+        "int" : 24000,
+        "float" : 29000,
+        "bool" : 34000
     },
     "CS" : { # Constant Segment
-        "int" : 41000,
-        "float" : 46000,
-        "char" : 51000,
-        "bool" : 53000
+        "int" : 36000,
+        "float" : 41000,
+        "char" : 46000
     }
 }
 
@@ -45,13 +41,33 @@ class VirtualMemory:
     def resetLocal(self):
         self.memory["LS"] = copy.deepcopy(memoryArchitecture["LS"])
 
-    # def resetTemporary(self):
-    #     self.memory["TS"] = dict(memoryArchitecture["TS"])
+    def resetAvail(self):
+        self.memory["TS"] = dict(memoryArchitecture["TS"])
 
-    # def nextAvail(self, addressType):
-    #     address = self.memory["TS"][addressType]
-    #     self.memory["TS"][addressType] += 1
-    #     return address
+    def nextAvail(self, addressType):
+        address = self.memory["TS"][addressType]
+        self.memory["TS"][addressType] += 1
+        return address
+
+    # Returns the local count variables that were used in a list
+    def getLocalSize(self):
+        mls = self.memory["LS"]
+        mals = memoryArchitecture["LS"]
+        return [
+                    mls["int"] - mals["int"],
+                    mls["float"] - mals["float"],
+                    mls["char"] - mals["char"]
+                ]
+
+    # Returns the local count of temporals that were used in a list
+    def getTempSize(self):
+        mts = self.memory["TS"]
+        mats = memoryArchitecture["TS"]
+        return [
+                    mts["int"] - mats["int"],
+                    mts["float"] - mats["float"],
+                    mts["bool"] - mats["bool"]
+                ]
 
     def nextConstant(self, addressType):
         address = self.memory["CS"][addressType]

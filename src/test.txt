@@ -1,54 +1,32 @@
 program patito;
+
 var
-    int i;
-class ParentCar {
-    var
-        int i;
+    int a, b;
+    float f;
+
+func void uno(int a){
+    a = a + b * a;
+    print(a, b, a + b);
 }
 
-class Car derives ParentCar{
-    var
-        int j;
-    methods:
-        func int test(){
-
-        }
-}
-
-func float arithmetic(int param1)
-var
-float i, a, b, c, d, e;
-{           
-    while (a < b){
-        if (((i + a) - b/c * d >= e) | ((i > a) & (b < c))){
-            a =  156 / c;
-        }
-        else{
-            a = 10;
-            b = c - 5 * (4 + e);
-        }
-    }
-
-    if (a > b){
-        a = 0;
-    }
-}
-
-func float arithmetic(int param1)
+func void dos(int a, int b, float g)
 var
     int i;
 {
-            return (i / (car.size + 10) - 100/50 * 2);
-        }
+    i = b;
+    while (i > 0){
+        a = a + b * i + b;
+        uno(i * 2);
+        print(a);
+        i = i - 1;
+    }
+}
 
-main()
-var
-    Test test;
-    Car car2;
-    float j;
-    int i;
-{
-    j = 10 / 10 + 11 / 11 + 12 / 12 + 13.0 / 13 + 14.0 / 14;
-    print("hola", j+10);
-    read(i);
+main(){
+    a = 3;
+    b = a + 1;
+    print(a, b);
+    f = 3.14;
+    dos(a + b * 2, b, f * 3);
+    print(a, b, f * 2 + 1);
 }

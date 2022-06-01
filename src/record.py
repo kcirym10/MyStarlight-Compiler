@@ -9,13 +9,21 @@ class programTypes(str, Enum):
 class Record:
     def __init__(self):
         # has the current parameters of the record
-        self.currentRecord = {'type': None, 'childRef': None}
+        self.currentRecord = {}
 
     def setType(self, type):
         self.currentRecord['type'] = type
 
     def setMemoryAdress(self, address):
         self.currentRecord['address'] = address
+
+    def setQuadNumber(self, quadNum):
+        self.currentRecord['quadNum'] = quadNum
+
+    # Size structure is :  [[local int, local float, local char], 
+    #                       [temp int, temp float, temp bool]]
+    def setSizeStruct(self):
+        self.currentRecord['size'] = [[0, 0, 0], [0, 0, 0]]
 
     def setChildRef(self, childRef):
         self.currentRecord['childRef'] = childRef
@@ -24,7 +32,7 @@ class Record:
         return self.currentRecord['childRef']
 
     def clearCurrentRecord(self):
-        self.currentRecord = {'type': None, 'address': None, 'childRef': None}
+        self.currentRecord = {}
 
     def returnRecord(self):
         return self.currentRecord

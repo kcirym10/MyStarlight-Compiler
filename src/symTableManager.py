@@ -15,6 +15,13 @@ class symTableManager(List):
     def __init__(self):
         self.pushTable(symTable())
 
+    def setFunctionSize(self, locals, temps):
+        # print(self[-1].parentRef[self[-1].parentName]['size'])
+        # print(locals)
+        # print(temps)
+        self[-1].parentRef[self[-1].parentName]['size'] = [locals, temps]
+        #print(self[-1].parentRef[self[-1].parentName]['size'])
+
     # Sets current type in case needed xD
     def setCurrentType(self, type):
         self.currentType = type
@@ -24,8 +31,8 @@ class symTableManager(List):
         return self.currentType
 
     # Returns a new table to be used either as a new scope or a new variables table
-    def getNewSymTable(self):
-        newSymTable = symTable(self[-1])
+    def getNewSymTable(self, parentName = ""):
+        newSymTable = symTable(self[-1], parentName)
         return newSymTable
 
     # Checks if variable is declared
@@ -37,8 +44,14 @@ class symTableManager(List):
     # Checks if ID is declared
     def isKeyDeclared(self, key):
         if self[-1].keyNotExists(key):
-            return True
-        return False
+            return False
+        return True
+
+    # Searches for function ID on function calls
+    def isFuncDeclared(self, key):
+        if self[0].keyNotExists(key):
+            return False
+        return True
 
     # Search for atomic record (function or variable)
     def searchAtomic(self, key):

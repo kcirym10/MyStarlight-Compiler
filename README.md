@@ -53,7 +53,14 @@ MyStarlight's documentation can be found [insert link here]
 
 - Week 6:
   - Began implementing functions 
-  
+
+- Week 7:
+  - Implemented Error-Handling
+  - Created quadruples for function definitions
+  - Created quadruples for function calls
+  - Fixed bugs in VARS Table
+  - Modified records
+
 ---
 ### 🤖 Authors
 | Name                   | Student ID |

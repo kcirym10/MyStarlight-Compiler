@@ -1,3 +1,4 @@
+from distutils.log import error
 import os.path
 import copy
 
@@ -8,7 +9,7 @@ from record import Record
 from symTable import symTable
 from symTableManager import symTableManager
 from virtualMemory import VirtualMemory
-
+from helper import errorList
 
 class StartlightParser(Parser):
 
@@ -20,7 +21,7 @@ class StartlightParser(Parser):
     # Set of rules for sintaxis
 
     # Program
-    @_('PROGRAM np_create_global_symTable ID np_program_record ";" opt_vars opt_classes opt_funcs main')
+    @_('PROGRAM np_create_global_symTable ID np_program_record ";" opt_vars opt_classes opt_funcs main end')
     def program(self, p):
         print("Successfully compiled uwu")
 
@@ -37,6 +38,8 @@ class StartlightParser(Parser):
         global vMem
         vMem = VirtualMemory()
         record.setType(record.getProgramType())
+        # Create first quad GOTO Main
+        quads.createGotoMain()
 
     @_('')
     def np_program_record(self, p):
@@ -109,6 +112,7 @@ class StartlightParser(Parser):
                 record.clearCurrentRecord()
             else:
                 print(f"Multiple declaration of key: \"{p[-1]}\"")
+                errorList.append(f"Multiple declaration of key: \"{p[-1]}\"")
 
     @_('"," ID np_save_id moreids', 'eps')
     def moreids(self, p):
@@ -161,6 +165,7 @@ class StartlightParser(Parser):
                     symMngr.pushTable(symMngr[-1][p[-4]]['childRef'])
                 else:
                     print("Undefined class derivation")
+                    errorList.append("Undefined class derivation")
 
     @_('methods', 'eps')
     def opt_methods(self, p):
@@ -176,22 +181,44 @@ class StartlightParser(Parser):
     def functions(self, p):
         pass
 
-    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" np_exit_scope functions')
+    @_('FUNC func_types ID np_save_func_id "(" np_create_var_table opt_param ")" opt_vars "{" body "}" np_endfunc np_exit_scope functions')
     def function(self, p):
         pass
 
     @_('')
     def np_save_func_id(self, p):
         if symMngr.canPushOrPop:
-            if symMngr.isKeyDeclared(p[-1]):
+            # Check for unique global variable naming and function naming
+            # if 'VARS' in symMngr[0]:
+            #     if p[-1] in symMngr[0]['VARS']['childRef']:
+            #         kErr = 0
+            #     else:
+            #         kErr = None
+            # if not symMngr.isKeyDeclared(p[-1]) and kErr is None:
+            if not symMngr.isKeyDeclared(p[-1]):
                 record.setType(symMngr.getCurrentType())
-                record.setChildRef(symMngr.getNewSymTable())
+                record.setQuadNumber(quads.ip)
+                record.setSizeStruct()
+                record.setChildRef(symMngr.getNewSymTable(p[-1]))
                 symMngr.insertRecord(p[-1], record.returnRecord())
                 symMngr.pushTable(record.getChildRef())
                 record.clearCurrentRecord()
             else:
                 symMngr.canPushOrPop = False
                 print(f"Multiple declaration of key: \"{p[-1]}\"")
+                errorList.append(f"Multiple declaration of key: \"{p[-1]}\"")
+        return
+
+    @_('')
+    def np_endfunc(self, p):
+        if symMngr.canPushOrPop:
+            #print(symMngr[-1].parentRef[symMngr[-1].parentName]['size'])
+            # Save the size of the current function scope to its size parameter
+            symMngr.setFunctionSize(vMem.getLocalSize(), quads.avail.getTempSize())
+            # Create ENDFUNC Quadruple
+            quads.createEndFunc()
+            # Delete vars table from current scope
+            symMngr[-1].pop('VARS')
 
     # Set current type in symMngr to void
     @_('type', 'VOID')
@@ -199,7 +226,7 @@ class StartlightParser(Parser):
         if (p[-1] == "void"):
             symMngr.setCurrentType(p[-1])
 
-    @_('param moreparams', 'eps')
+    @_('param', 'eps')
     def opt_param(self, p):
         pass
 
@@ -208,9 +235,14 @@ class StartlightParser(Parser):
         pass
 
     # Param
-    @_('type ID np_save_id')
+    @_('type ID np_save_id np_save_param moreparams')
     def param(self, p):
         pass
+
+    # Saves the current type of the param to the signature list
+    @_('')
+    def np_save_param(self, p):
+        symMngr[-1].addToSignature(symMngr.currentType)
 
     # Type
     @_('INT', 'FLOAT', 'CHAR')
@@ -251,8 +283,16 @@ class StartlightParser(Parser):
         pass
 
     # Read Statement
-    @_('READ "(" variable np_create_read_quad ")" ";"')
+    @_('READ "(" r_args ")" ";"')
     def read(self, p):
+        pass
+
+    @_('variable np_create_read_quad more_r_args')
+    def r_args(self, p):
+        pass
+
+    @_('"," r_args', 'eps')
+    def more_r_args(self, p):
         pass
 
     @_('')
@@ -306,32 +346,73 @@ class StartlightParser(Parser):
 
     @_('')
     def np_cycle_start(self, p):
-        quads.addJump()
+        if symMngr.canPushOrPop:
+            quads.addJump()
 
     @_('')
     def np_while(self, p):
-        quads.createGotoF()
+        if symMngr.canPushOrPop:
+            quads.createGotoF()
 
     @_('')
     def np_while_return(self, p):
-        quads.createGoto()
+        if symMngr.canPushOrPop:
+            quads.createWhileGoto()
 
     # Call Func Statement
     @_('call_func_body ";"')
     def call_func(self, p):
         pass
 
-    @_('ID opt_class_func "(" opt_call_params ")" ')
+    @_('ID opt_class_func np_func_call "(" np_func_ERA opt_call_params ")" np_func_gosub')
     def call_func_body(self, p):
         pass
 
     @_(' "." ID', 'eps')
     def opt_class_func(self, p):
-        pass
+        if p[0] == ".":
+            #print(p[-1])
+            return p[-1]
 
-    @_('expression more_expressions', 'eps')
+    # If the function id does not exist we generate an error
+    @_('')
+    def np_func_call(self, p):
+        if symMngr.canPushOrPop:
+            if p[-1] is None:
+                if not symMngr.isFuncDeclared(p[-2]):
+                    errorList.append(f"Undefined function call id: {p[-2]}")
+                    print(f"Undefined function call id: {p[-2]}")
+            #     print("FUNCTION CALL ", p[-2])
+            # else:
+            #     print("CLASS FUNCTION CALL")
+
+    @_('')
+    def np_func_ERA(self, p):
+        if symMngr.canPushOrPop:
+            if p[-3] is None:
+                if symMngr.isFuncDeclared(p[-4]):
+                    funcSize = symMngr[0][p[-4]]['size']
+                    paramSignature = symMngr[0][p[-4]]['childRef']['paramSignature']
+                    quads.createERA(funcSize, paramSignature)
+
+    @_('')
+    def np_func_gosub(self, p):
+        pass
+        if symMngr.canPushOrPop:
+            if p[-6] is None:
+                if symMngr.isFuncDeclared(p[-7]):
+                    quadNum = symMngr.searchAtomic(p[-7])['quadNum']
+                    quads.createGoSub(quadNum)
+            # else, search the function in classes
+                    
+
+    @_('expression np_func_param more_expressions', 'eps')
     def opt_call_params(self, p):
         pass
+
+    @_('')
+    def np_func_param(self, p):
+        quads.createParam()
 
     @_('"," opt_call_params', 'eps')
     def more_expressions(self, p):
@@ -362,6 +443,7 @@ class StartlightParser(Parser):
                     quads.pushOperandType(record["address"], record['type'])
                 else:
                     print(f"Key: \"{p[-3]}\" is not defined")
+                    errorList.append(f"Key: \"{p[-3]}\" is not defined")
 
     @_(' "[" expression opt_dim_call "]"', 'eps')
     def opt_arr_call(self, p):
@@ -469,7 +551,7 @@ class StartlightParser(Parser):
 
     @_('')
     def np_rem_fake_bottom(self, p):
-        if symMngr.canPushOrPop:
+        if symMngr.canPushOrPop and len(errorList) == 0:
             if quads.operatorStack[-1] == '(':
                 quads.operatorStack.pop()
 
@@ -480,9 +562,14 @@ class StartlightParser(Parser):
             # If no global variable table
             if not symMngr[0].hasVarTable():
                 record.setType("Var Table")
-                # TODO: Need parent ref
                 record.setChildRef(symMngr.getNewSymTable())
                 symMngr[0].saveRecord('VARS', record.returnRecord())
+                record.clearCurrentRecord()
+            # Save into constants table
+            if 'CTE' not in symMngr[0]:
+                record.setType('cte')
+                record.setChildRef(symMngr.getNewSymTable())
+                symMngr[0].saveRecord('CTE', record.returnRecord())
                 record.clearCurrentRecord()
 
             searchRes = symMngr.searchAtomic(str(p[-1]))
@@ -491,6 +578,7 @@ class StartlightParser(Parser):
             if searchRes == None:
                 memAddress = vMem.nextConstant(cteType)
                 symMngr[0]['VARS']['childRef'][str(p[-1])] = memAddress
+                symMngr[0]['CTE']['childRef'][str(p[-1])] = memAddress
             else:
                 memAddress = searchRes
                 #print("Value: ", p[-1], " Address: ", searchRes)
@@ -514,6 +602,13 @@ class StartlightParser(Parser):
             symMngr.pushTable(record.getChildRef())
             record.clearCurrentRecord()
 
+            # Fill quad goto main
+            quads.fillGotos()
+
+    @_('')
+    def end(self, p):
+        if symMngr.canPushOrPop:
+            quads.createEndProgram()
     # Epsilon, describes an empty production
 
     @_('')
@@ -540,10 +635,11 @@ if __name__ == '__main__':
 
         result = parser.parse(lexer.tokenize(s))
         # print(result)
-        # print(symMngr)
+        print(symMngr)
         print(quads.operatorStack)  # TODO: Fix Var Table and Sym Table
         print(quads.operandStack)
         print(quads.typeStack)
+        print(quads.jumpStack)
         print(quads)
     except EOFError:
         print("Error" + EOFError)
