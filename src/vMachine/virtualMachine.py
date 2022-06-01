@@ -120,7 +120,7 @@ class virtualMachine:
         while (self.quadList[ip][0] != "ENDPROGRAM"):
             #print(self.memUsage)
             quad = self.quadList[ip]
-            print(quad)
+            # print(quad)
             #print(ip)
             quadCode = quad[0]
             # Special
