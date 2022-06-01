@@ -220,17 +220,33 @@ class Quadruples:
         if len(errorList) == 0:
             self.createQuadruple(self.quadCodes['ep'], None, None, None)
     
-    def createReturn(self):
+    def createReturn(self, returnRecord):
         if len(errorList) == 0:
-            returnAddress = self.operandStack.pop()
-            returnType = self.typeStack.pop()
+            print(self.operandStack)
+            # First remove the global return address and the result temp
+            returnAddress = returnRecord['address']
+            returnType = returnRecord['type']
             result = self.operandStack.pop()
             resultType = self.typeStack.pop()
-            print(resultType)
-            print(returnType)
-            print(resultType == returnType)
             self.createQuadruple(self.quadCodes['return'], result, None, returnAddress)
+            # Then return the global address which received the result to the stack
+            # This address will be assigned to a temporal address created on function call
+            # self.pushOperandType(returnAddress, returnType)
 
+    def createReturnAssignment(self, returnRecord):
+        if len(errorList) == 0:
+            print(self.operandStack)
+            # First remove the return address from the stack
+            returnAddress = returnRecord['address']
+            returnType = returnRecord['type']
+            # Then create a new temporal space to assign the address to
+            result = self.avail.nextAvail(returnType)
+            resultType = returnType
+            # Now add the returns global address to the temporal address
+            self.createQuadruple('=', returnAddress, None, result)
+            # Finally return the temporal address to the stack
+            self.pushOperandType(result, resultType)
+            print(self.operandStack)
 
     def __str__(self):
         if len(errorList) == 0:

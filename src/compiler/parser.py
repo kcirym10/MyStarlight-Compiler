@@ -391,6 +391,8 @@ class StartlightParser(Parser):
                 if not symMngr.isFuncDeclared(p[-2]):
                     errorList.append(f"Undefined function call id: {p[-2]}")
                     print(f"Undefined function call id: {p[-2]}")
+                else:
+                    quads.operatorStack.append('(')
             #     print("FUNCTION CALL ", p[-2])
             # else:
             #     print("CLASS FUNCTION CALL")
@@ -406,12 +408,23 @@ class StartlightParser(Parser):
 
     @_('')
     def np_func_gosub(self, p):
-        pass
         if symMngr.canPushOrPop:
             if p[-6] is None:
                 if symMngr.isFuncDeclared(p[-7]):
+                    if quads.operatorStack[-1] == "(":
+                        quads.operatorStack.pop()
+                    print(quads.operatorStack)
+                    print("AAAAAAAAAAAAAAAA")
                     quadNum = symMngr.searchAtomic(p[-7])['quadNum']
                     quads.createGoSub(quadNum)
+                    print(symMngr)
+                    if 'returns' in symMngr[0]:
+                        returnRecord = symMngr[0]['returns']['childRef'][p[-7]]
+                        print(returnRecord)
+                        quads.createReturnAssignment(returnRecord)
+                    elif symMngr.searchAtomic(p[-7])['type'] != 'void':
+                        errorList.append("Missing return in non-void function")
+                        return
             # else, search the function in classes
                     
 
@@ -435,18 +448,19 @@ class StartlightParser(Parser):
                 #symMngr[-1].funcNeedsReturn = False
                 symMngr[-1].returnCounter += 1
 
-                # We create a global vars table if one does not exist
-                if not symMngr[0].hasVarTable():
-                    record.setType("Var Table")
+                # We create a return table if one does not exist
+                # this table holds the return addresses for function returns
+                if 'returns' not in symMngr[0]:
+                    record.setType("Return Addresses")
                     record.setChildRef(symMngr.getNewSymTable())
-                    symMngr[0].saveRecord('VARS', record.returnRecord())
+                    symMngr[0].saveRecord('returns', record.returnRecord())
                     record.clearCurrentRecord()
                 
                 # We obtain the parent record and parent name to get it's information
                 # the name is used in searching, a reference to the global Vars table for
                 # convenience and the parent record for type and address access
                 fName = symMngr[-1].parentName
-                globalVars = symMngr[0]['VARS']['childRef']
+                globalVars = symMngr[0]['returns']['childRef']
                 parentRecord = symMngr[0][fName]
                 returnRecord = None
                 if fName not in globalVars:
@@ -458,12 +472,15 @@ class StartlightParser(Parser):
                 else:
                     returnRecord = globalVars[fName]
 
+                #print(returnRecord)
+
                 # We can use the return record to help quadruple processing
                 # in this instance we will be creating an assignment quadruple later on
                 # in another NP
-                quads.pushOperandType(returnRecord['address'], returnRecord['type'])
+                #print(symMngr[0])
+                #quads.pushOperandType(returnRecord['address'], returnRecord['type'])
                 # Create return quadruple
-                #quads.createReturn()
+                quads.createReturn(returnRecord)
                 
             else:
                 errorList.append("Return in void function detected")
@@ -706,6 +723,7 @@ if __name__ == '__main__':
         print(quads.typeStack)
         print(quads.jumpStack)
         print(quads)
+        print(errorList)
 
         cte = None
         if 'CTE' in symMngr[0]:

@@ -1,10 +1,10 @@
-program patito;
+program test;
 
 var
     int a, b;
     float f;
 
-func int uno(int a){
+func void uno(int a){
     a = a + b * a;
     print(a, b, a + b);
 }
@@ -21,12 +21,14 @@ var
         i = i - 1;
     }
 }
+func int recursiveFib(int a){
+    if (a <= 0){
+        return(1);
+    }
+
+    return(recursiveFib(a - 1) + recursiveFib(a - 2));
+}
 
 main(){
-    a = 3;
-    b = a + 1;
-    print(a, b);
-    f = 3.14;
-    dos(a + b * 2, b, f * 3);
-    print(a, b, f * 2 + 1);
+    print(recursiveFib(5));
 }
