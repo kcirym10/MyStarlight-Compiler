@@ -1,8 +1,7 @@
-from pydoc import Helper
 import sys
 
 from compiler.parser import parseProgram
-from compiler.helper import structsFromFile
+from compiler.helper import structsFromFile, errorList
 from vMachine.virtualMachine import virtualMachine
 
 if __name__ == "__main__":
@@ -15,6 +14,10 @@ if __name__ == "__main__":
     else:
         fileName = args[0]
         parseProgram(fileName)
-        virtualMachine().run()
+        if len(errorList) == 0:
+            virtualMachine().run()
+        else:
+            for err in errorList:
+                print(err)
         
         
