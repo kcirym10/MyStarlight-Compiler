@@ -13,7 +13,7 @@ class symTable(Dict):
         self.parentRef = parentRef # Allows for searches into the parent tree
         self.parentName = parentName
         self.funcNeedsReturn = False
-    
+        self.returnCounter = 0
     def hasVarTable(self):
         if 'VARS' in self:
             return True

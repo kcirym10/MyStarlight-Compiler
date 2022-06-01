@@ -205,9 +205,7 @@ class StartlightParser(Parser):
                 symMngr.insertRecord(p[-1], record.returnRecord())
                 symMngr.pushTable(record.getChildRef())
                 if symMngr.getCurrentType() != "void":
-                    print("Function needs return")
                     symMngr[-1].funcNeedsReturn = True
-                    print(symMngr[-1])
                 record.clearCurrentRecord()
             else:
                 symMngr.canPushOrPop = False
@@ -218,7 +216,7 @@ class StartlightParser(Parser):
     @_('')
     def np_endfunc(self, p):
         if symMngr.canPushOrPop:
-            if symMngr[-1].funcNeedsReturn:
+            if symMngr[-1].funcNeedsReturn and symMngr[-1].returnCounter == 0:
                 print("Missing return in non-void function")
                 errorList.append("Missing return in none-void function")
             #print(symMngr[-1].parentRef[symMngr[-1].parentName]['size'])
@@ -434,7 +432,8 @@ class StartlightParser(Parser):
     def function_return(self, p):
         if symMngr.canPushOrPop:
             if symMngr[-1].funcNeedsReturn:
-                symMngr[-1].funcNeedsReturn = False
+                #symMngr[-1].funcNeedsReturn = False
+                symMngr[-1].returnCounter += 1
 
                 # We create a global vars table if one does not exist
                 if not symMngr[0].hasVarTable():
@@ -464,7 +463,7 @@ class StartlightParser(Parser):
                 # in another NP
                 quads.pushOperandType(returnRecord['address'], returnRecord['type'])
                 # Create return quadruple
-                quads.createReturn()
+                #quads.createReturn()
                 
             else:
                 errorList.append("Return in void function detected")
@@ -580,14 +579,8 @@ class StartlightParser(Parser):
         pass
 
     # F
-    @_('"(" np_add_fake_bottom expression ")" np_rem_fake_bottom', 'variable', 'np_push_return_space call_func_body', 'var_cte')
+    @_('"(" np_add_fake_bottom expression ")" np_rem_fake_bottom', 'variable', 'call_func_body', 'var_cte')
     def f(self, p):
-        pass
-
-    # Save a new temporal address to where the result of the function call will be saved
-    # in the current context
-    @_('')
-    def np_push_return_space(self, p):
         pass
 
     @_('')
