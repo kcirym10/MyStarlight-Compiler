@@ -31,7 +31,7 @@ class memory:
 class virtualMachine:
     constants = None
     quadList = None
-    memLimit = 1000
+    memLimit = 100000
 
     # Declare memory structure as mem = []
     def __init__(self):
@@ -54,6 +54,10 @@ class virtualMachine:
         if address < 18000:
             return self._tempMemory[-1]
         return self._constantMemory
+
+    def removeContext(self):
+        self._localMemory.pop()
+        self._tempMemory.pop()
 
     def populateConstants(self, constants):
         for key, value in constants.items():
@@ -116,7 +120,7 @@ class virtualMachine:
         while (self.quadList[ip][0] != "ENDPROGRAM"):
             #print(self.memUsage)
             quad = self.quadList[ip]
-            #print(quad)
+            print(quad)
             #print(ip)
             quadCode = quad[0]
             # Special
@@ -164,6 +168,12 @@ class virtualMachine:
                 self._jumpStack.append(ip)
                 ip = int(quad[3])
                 continue
+            elif quadCode == "RETURN":
+                a1 = int(quad[1])
+                a3 = int(quad[3])
+                self.memSeg(a3).setValue(a3, self.memSeg(a1).getValue(a1))
+                self.removeContext()
+                ip = self._jumpStack.pop()
             elif quadCode == "ENDFUNC":
                 # Free up memory space
                 self.memUsage -= self._localMemory[-1].memSize + self._tempMemory[-1].memSize
