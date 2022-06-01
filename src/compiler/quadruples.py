@@ -196,8 +196,8 @@ class Quadruples:
                 if argType == currentParam[0]:
                     self.createQuadruple(self.quadCodes['param'], arg, None, currentParam[1])
                 else:
-                    errorList.append(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex]}")
-                    print(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex]}")
+                    errorList.append(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex][0]}")
+                    #print(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex][0]}")
                 
             # else:
             #     errorList.append("Too many parameters")
@@ -211,19 +211,25 @@ class Quadruples:
             # Verify that the signature's index is the correct length
             if self.sigIndex == len(self.currentSignature):
                 self.createQuadruple(self.quadCodes['goSub'], None, None, quadNum)
+            elif self.sigIndex < len(self.currentSignature):
+                errorList.append('Too little arguments')
+            else:
+                errorList.append('Too many arguments')
     
     def createEndProgram(self):
         if len(errorList) == 0:
             self.createQuadruple(self.quadCodes['ep'], None, None, None)
     
-    def createReturn(self, returnType):
+    def createReturn(self):
         if len(errorList) == 0:
+            returnAddress = self.operandStack.pop()
+            returnType = self.typeStack.pop()
             result = self.operandStack.pop()
             resultType = self.typeStack.pop()
             print(resultType)
             print(returnType)
             print(resultType == returnType)
-            self.createQuadruple(self.quadCodes['return'], None, None, result)
+            self.createQuadruple(self.quadCodes['return'], result, None, returnAddress)
 
 
     def __str__(self):
