@@ -61,7 +61,6 @@ MyStarlight's documentation can be found [insert link here]
   - Fixed bugs in VARS Table
   - Modified records
 
-
 ---
 ### 🤖 Authors
 | Name                   | Student ID |
