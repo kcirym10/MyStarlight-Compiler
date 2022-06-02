@@ -90,6 +90,11 @@ class semanticCube:
                 OperatorType.EQUALS: AtomicType.BOOL
             }
         },
+        AtomicType.CHAR: {
+            AtomicType.CHAR: {
+                OperatorType.ASSIGN: AtomicType.CHAR
+            }
+        },
         AtomicType.BOOL: {
             AtomicType.BOOL: {
                 OperatorType.AND: AtomicType.BOOL,
