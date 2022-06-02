@@ -413,15 +413,17 @@ class StartlightParser(Parser):
                 if symMngr.isFuncDeclared(p[-7]):
                     if quads.operatorStack[-1] == "(":
                         quads.operatorStack.pop()
-                    print(quads.operatorStack)
-                    print("AAAAAAAAAAAAAAAA")
+                    #print(quads.operatorStack)
+                    #print("AAAAAAAAAAAAAAAA")
                     quadNum = symMngr.searchAtomic(p[-7])['quadNum']
                     quads.createGoSub(quadNum)
-                    print(symMngr)
+                    #print(symMngr)
                     if 'returns' in symMngr[0]:
-                        returnRecord = symMngr[0]['returns']['childRef'][p[-7]]
-                        print(returnRecord)
-                        quads.createReturnAssignment(returnRecord)
+                        #print(quads.quadList)
+                        if symMngr.searchAtomic(p[-7])['type'] != 'void':
+                            returnRecord = symMngr[0]['returns']['childRef'][p[-7]]
+                            print(returnRecord)
+                            quads.createReturnAssignment(returnRecord)
                     elif symMngr.searchAtomic(p[-7])['type'] != 'void':
                         errorList.append("Missing return in non-void function")
                         return
