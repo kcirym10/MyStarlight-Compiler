@@ -172,14 +172,16 @@ class virtualMachine:
                 a1 = int(quad[1])
                 a3 = int(quad[3])
                 self.memSeg(a3).setValue(a3, self.memSeg(a1).getValue(a1))
+                # Free memory from the previous context
+                self.memUsage -= self._localMemory[-1].memSize + self._tempMemory[-1].memSize
+                # Remove the current context and return to the last ip
                 self.removeContext()
                 ip = self._jumpStack.pop()
             elif quadCode == "ENDFUNC":
                 # Free up memory space
                 self.memUsage -= self._localMemory[-1].memSize + self._tempMemory[-1].memSize
                 # Remove the current context and return to the last ip
-                self._localMemory.pop()
-                self._tempMemory.pop()
+                self.removeContext()
                 ip = self._jumpStack[-1]
                 self._jumpStack.pop()
             # Reading and Writting
@@ -187,6 +189,7 @@ class virtualMachine:
                 a3 = int(quad[3])
                 #print(self.memSeg(a1))
                 print(self.memSeg(a3).getValue(a3))
+                print('Memory usage ', self.memUsage)
             elif quadCode == "READ":
                 # must check for the expected type if not raise error
                 a3 = int(quad[3])
