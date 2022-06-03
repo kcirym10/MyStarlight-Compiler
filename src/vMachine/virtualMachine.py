@@ -46,7 +46,7 @@ class virtualMachine:
     # The Memory Segment function
     # Returns the appropriate memory to use
     # Based on the range in which an address is located
-    def memSeg(self, address, ctxt = None):
+    def memSeg(self, address):
         if address < 6000:
             return self._globalMemory
         if address < 12000:
@@ -120,7 +120,7 @@ class virtualMachine:
         while (self.quadList[ip][0] != "ENDPROGRAM"):
             #print(self.memUsage)
             quad = self.quadList[ip]
-            # print(quad)
+            #print(quad)
             #print(ip)
             quadCode = quad[0]
             # Special
@@ -186,9 +186,15 @@ class virtualMachine:
                 self._jumpStack.pop()
             # Reading and Writting
             elif quadCode == "PRINT":
-                a3 = int(quad[3])
+                a3 = None
+                #print(quad[3][0])
+                if quad[3][0] == '\"': 
+                    a3 = quad[3]
+                    print(a3[1:-1])
+                else:
+                    a3 = int(quad[3])
                 #print(self.memSeg(a1))
-                print(self.memSeg(a3).getValue(a3))
+                    print(self.memSeg(a3).getValue(a3))
                 print('Memory usage ', self.memUsage)
             elif quadCode == "READ":
                 # must check for the expected type if not raise error
