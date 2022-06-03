@@ -633,6 +633,8 @@ class StartlightParser(Parser):
             searchRes = symMngr.searchAtomic(str(p[-1]))
             # Gets the data type from the constant token
             cteType = str(type(p[-1]).__name__)
+            if cteType == 'str':
+                cteType = 'char'
             if searchRes == None:
                 memAddress = vMem.nextConstant(cteType)
                 symMngr[0]['VARS']['childRef'][str(p[-1])] = memAddress
