@@ -51,7 +51,7 @@ def structsFromFile():
         if counter <= constCount:
             index = line.find(' ')
             if int(line[index + 1:-1]) >=  22000:
-                constants[line[index + 1:-1]] = line[0]
+                constants[line[index + 1:-1]] = line[1]
             elif line[:index].find('.') == -1:
                 constants[line[index + 1:-1]] = int(line[:index])
             else:
