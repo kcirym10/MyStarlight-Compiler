@@ -61,6 +61,10 @@ MyStarlight's documentation can be found [insert link here]
   - Fixed bugs in VARS Table
   - Modified records
 
+- Week 8
+  - Implemented virtual machine up to functions
+  - Recursion
+  - Etc
 
 ---
 ### 🤖 Authors
