@@ -50,7 +50,9 @@ def structsFromFile():
         # Read the ammount of constants and save them to a dict
         if counter <= constCount:
             index = line.find(' ')
-            if line[:index].find('.') == -1:
+            if int(line[index + 1:-1]) >=  22000:
+                constants[line[index + 1:-1]] = line[0]
+            elif line[:index].find('.') == -1:
                 constants[line[index + 1:-1]] = int(line[:index])
             else:
                 constants[line[index + 1:-1]] = float(line[:index])
