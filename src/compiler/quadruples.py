@@ -68,7 +68,7 @@ class Quadruples:
     def createIfTopIs(self, operator):
         if len(errorList) == 0:
             # If operator stack not empty
-            if self.operatorStack:
+            if len(self.operatorStack) > 0:
                 # Check top of the stack
                 oper = self.operatorStack.pop()
                 self.operatorStack.append(oper)
@@ -79,7 +79,11 @@ class Quadruples:
                     # self.operatorStack.append(oper)
                     #print("Operator: ", oper)
                     right_operand = self.operandStack.pop()  # right operand
-                    left_operand = self.operandStack.pop()  # left operand
+                    if len(self.operandStack) >= 1:
+                        left_operand = self.operandStack.pop()  # left operand
+                    else:
+                        errorList.append("Expression error, posible assignment of void function")
+                        return
                     right_type = self.typeStack.pop()
                     left_type = self.typeStack.pop()
 
