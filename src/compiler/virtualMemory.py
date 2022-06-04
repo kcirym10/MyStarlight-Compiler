@@ -64,6 +64,9 @@ class VirtualMemory:
     def resetLocal(self):
         self.memory["LS"] = copy.deepcopy(memoryArchitecture["LS"])
 
+    def offsetByDimension(self, addressType, dimSize):
+        self.memory["LS"][addressType] += dimSize
+
     def resetAvail(self):
         self.memory["TS"] = dict(memoryArchitecture["TS"])
 

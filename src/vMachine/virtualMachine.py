@@ -15,6 +15,11 @@ class memory:
             #print(key," ",keyList.index(key))
             startRange = self.memType[key]
             if int(address) >= startRange and int(address) < startRange + 2000:
+                if int(address) not in self.memory[keyList.index(key)]:
+                    if key == 'char':
+                        self.memory[keyList.index(key)][int(address)] = str(0)
+                    else:
+                        self.memory[keyList.index(key)][int(address)] = 0
                 return self.memory[keyList.index(key)]
 
     def getValue(self, address):
@@ -116,8 +121,16 @@ class virtualMachine:
     # This function runs all the instructions that are in the
     # quadrple list.
     def runInstructions(self):
+        runTimeError = ""
         ip = 0
         while (self.quadList[ip][0] != "ENDPROGRAM"):
+            # Check memory usage in case new variables were created and size not modified in recursive call
+            if self.memUsage > self.memLimit:
+                runTimeError = "Stack Overflow"
+            # Check and possibly throw execution error
+            if runTimeError != "":
+                print(runTimeError)
+                return
             #print(self.memUsage)
             quad = self.quadList[ip]
             #print(quad)
@@ -147,8 +160,7 @@ class virtualMachine:
                         segSize[index] += int(item)
 
                 if self.memUsage + segSize[0] + segSize[1] > self.memLimit:
-                    print("Stack Overflow")
-                    return
+                    runTimeError = "Stack Overflow"
                 
                 # Create a temporarily parallel memory context before changing to it
                 self.tempContext = [memory("LS", segSize[0]), memory("TS", segSize[1])]
@@ -303,7 +315,7 @@ class virtualMachine:
                     self.memSeg(a3).setValue(a3, res)
                     self.memUsage += 1
                 else:
-                    print("ERROR division by 0 not supported")
+                    runTimeError = "ERROR division by 0 not supported"
             ip += 1
 
 
