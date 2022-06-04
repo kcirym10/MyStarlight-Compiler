@@ -60,6 +60,10 @@ class symTableManager(List):
     def searchAtomic(self, key):
         return self[-1].searchKey(key)
 
+    # Returns if the id has array attributes
+    def isArray(self, key):
+        return 'dims' in self.searchAtomic(key)
+
     # Pushes a new Symbol Table to the top of the stack
     # this could be a new scope (such as a function)
     def pushTable(self, table):
