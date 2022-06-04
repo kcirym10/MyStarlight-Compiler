@@ -4,9 +4,18 @@ var
     int a, b;
     float f;
 
+func float recursiveFib(int n, int second_last, int last){
+    if (n - 1 == 0){
+        return(second_last);
+    }
+    else{
+        return(recursiveFib(n - 1, last, second_last + last) * 1.0);
+    }
+}
 func void uno(int a){
     a = a + b * a;
     print(a, b, a + b);
+    print(recursiveFib(a, 0, 1));
 }
 
 func void dos(int a, int b, float g)
@@ -21,14 +30,22 @@ var
         i = i - 1;
     }
 }
-func int recursiveFib(int a){
-    if (a <= 0){
-        return(1);
-    }
 
-    return(recursiveFib(a - 1) + recursiveFib(a - 2));
-}
-
-main(){
-    print(recursiveFib(5));
+main()
+var
+    int a, b;
+    int d[10];
+    float l;
+    float g[0, -2], m[0], n[6,0];
+    char c;
+{
+    print("Hola mundo!");
+    c = 'A';
+    print(c);
+    print(recursiveFib(10, 0, 1));
+    a = 3;
+    print(a);
+    b = 2;
+    uno(10);
+    
 }
