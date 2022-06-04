@@ -39,8 +39,11 @@ class Record:
         self.currentRecord['dims'] = [[]]
     
     def setDimLim(self, dimLim):
-        self.currentRecord['dims'][self.currentDim][0] = dimLim
+        self.currentRecord['dims'][self.currentDim].append(dimLim)
         self.dimR = (dimLim + 1) * self.dimR
+    
+    def incDimCount(self):
+        self.currentDim += 1
 
     def clearCurrentRecord(self):
         self.currentDim = 0

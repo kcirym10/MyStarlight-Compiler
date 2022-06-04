@@ -120,9 +120,21 @@ class StartlightParser(Parser):
     def moreids(self, p):
         pass
 
-    @_('CLASS_ID np_class_id ID np_save_id moreids', 'type ID "[" CTE_INT two_dim "]" more_arr_ids')
+    @_('CLASS_ID np_class_id ID np_save_id moreids', 'type ID np_save_id "[" np_set_dims CTE_INT np_set_dim_limit two_dim "]" more_arr_ids')
     def compound(self, p):
         pass
+
+    @_('')
+    def np_set_dims(self, p):
+        record.setCurrentRecord(symMngr.getKeyRecord(p[-3]))
+        record.setDimList()
+        record.clearCurrentRecord()
+
+    @_('')
+    def np_set_dim_limit(self, p):
+        record.setCurrentRecord(symMngr.getKeyRecord(p[-5]))
+        record.setDimLim(p[-1])
+        record.clearCurrentRecord()
 
     @_('')
     def np_class_id(self, p):
