@@ -23,6 +23,7 @@ class OperatorType(str, Enum):
     GREATER_EQUAL = ">="
     SMALLER_EQUAL = "<="
     EQUALS = "=="
+    NOT_EQUAL = "!="
     AND = "&"
     OR = "|"
 
@@ -45,7 +46,8 @@ class semanticCube:
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
                 OperatorType.SMALLER_EQUAL: AtomicType.BOOL,
-                OperatorType.EQUALS: AtomicType.BOOL
+                OperatorType.EQUALS: AtomicType.BOOL,
+                OperatorType.NOT_EQUAL: AtomicType.BOOL
             },
             # second level dictionary
             AtomicType.FLOAT: {
@@ -57,7 +59,8 @@ class semanticCube:
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
                 OperatorType.SMALLER_EQUAL: AtomicType.BOOL,
-                OperatorType.EQUALS: AtomicType.BOOL
+                OperatorType.EQUALS: AtomicType.BOOL,
+                OperatorType.NOT_EQUAL: AtomicType.BOOL
             }
         },
         # Operations with float type
@@ -74,7 +77,8 @@ class semanticCube:
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
                 OperatorType.SMALLER_EQUAL: AtomicType.BOOL,
-                OperatorType.EQUALS: AtomicType.BOOL
+                OperatorType.EQUALS: AtomicType.BOOL,
+                OperatorType.NOT_EQUAL: AtomicType.BOOL
             },
             # second level dictionary
             AtomicType.INT: {
@@ -87,7 +91,8 @@ class semanticCube:
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
                 OperatorType.SMALLER_EQUAL: AtomicType.BOOL,
-                OperatorType.EQUALS: AtomicType.BOOL
+                OperatorType.EQUALS: AtomicType.BOOL,
+                OperatorType.NOT_EQUAL: AtomicType.BOOL
             }
         },
         AtomicType.CHAR: {
