@@ -15,6 +15,11 @@ class memory:
             #print(key," ",keyList.index(key))
             startRange = self.memType[key]
             if int(address) >= startRange and int(address) < startRange + 2000:
+                if int(address) not in self.memory[keyList.index(key)]:
+                    if key == 'char':
+                        self.memory[keyList.index(key)][int(address)] = str(0)
+                    else:
+                        self.memory[keyList.index(key)][int(address)] = 0
                 return self.memory[keyList.index(key)]
 
     def getValue(self, address):
@@ -31,7 +36,7 @@ class memory:
 class virtualMachine:
     constants = None
     quadList = None
-    memLimit = 1000
+    memLimit = 100000
 
     # Declare memory structure as mem = []
     def __init__(self):
@@ -46,7 +51,7 @@ class virtualMachine:
     # The Memory Segment function
     # Returns the appropriate memory to use
     # Based on the range in which an address is located
-    def memSeg(self, address, ctxt = None):
+    def memSeg(self, address):
         if address < 6000:
             return self._globalMemory
         if address < 12000:
@@ -54,6 +59,10 @@ class virtualMachine:
         if address < 18000:
             return self._tempMemory[-1]
         return self._constantMemory
+
+    def removeContext(self):
+        self._localMemory.pop()
+        self._tempMemory.pop()
 
     def populateConstants(self, constants):
         for key, value in constants.items():
@@ -112,8 +121,12 @@ class virtualMachine:
     # This function runs all the instructions that are in the
     # quadrple list.
     def runInstructions(self):
+        runTimeError = ""
         ip = 0
         while (self.quadList[ip][0] != "ENDPROGRAM"):
+            if runTimeError != "":
+                print(runTimeError)
+                return
             #print(self.memUsage)
             quad = self.quadList[ip]
             #print(quad)
@@ -143,8 +156,7 @@ class virtualMachine:
                         segSize[index] += int(item)
 
                 if self.memUsage + segSize[0] + segSize[1] > self.memLimit:
-                    print("Stack Overflow")
-                    return
+                    runTimeError = "Stack Overflow"
                 
                 # Create a temporarily parallel memory context before changing to it
                 self.tempContext = [memory("LS", segSize[0]), memory("TS", segSize[1])]
@@ -164,19 +176,34 @@ class virtualMachine:
                 self._jumpStack.append(ip)
                 ip = int(quad[3])
                 continue
+            elif quadCode == "RETURN":
+                a1 = int(quad[1])
+                a3 = int(quad[3])
+                self.memSeg(a3).setValue(a3, self.memSeg(a1).getValue(a1))
+                # Free memory from the previous context
+                self.memUsage -= self._localMemory[-1].memSize + self._tempMemory[-1].memSize
+                # Remove the current context and return to the last ip
+                self.removeContext()
+                ip = self._jumpStack.pop()
             elif quadCode == "ENDFUNC":
                 # Free up memory space
                 self.memUsage -= self._localMemory[-1].memSize + self._tempMemory[-1].memSize
                 # Remove the current context and return to the last ip
-                self._localMemory.pop()
-                self._tempMemory.pop()
+                self.removeContext()
                 ip = self._jumpStack[-1]
                 self._jumpStack.pop()
             # Reading and Writting
             elif quadCode == "PRINT":
-                a3 = int(quad[3])
+                a3 = None
+                #print(quad[3][0])
+                if quad[3][0] == '\"': 
+                    a3 = quad[3]
+                    print(a3[1:-1])
+                else:
+                    a3 = int(quad[3])
                 #print(self.memSeg(a1))
-                print(self.memSeg(a3).getValue(a3))
+                    print(self.memSeg(a3).getValue(a3))
+                print('Memory usage ', self.memUsage)
             elif quadCode == "READ":
                 # must check for the expected type if not raise error
                 a3 = int(quad[3])
@@ -284,7 +311,7 @@ class virtualMachine:
                     self.memSeg(a3).setValue(a3, res)
                     self.memUsage += 1
                 else:
-                    print("ERROR division by 0 not supported")
+                    runTimeError = "ERROR division by 0 not supported"
             ip += 1
 
 

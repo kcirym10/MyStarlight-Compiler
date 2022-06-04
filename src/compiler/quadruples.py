@@ -46,7 +46,7 @@ class Quadruples:
     ip = 0
     # Param Pointer
     currentSignature = []
-    sigIndex = 0
+    sigIndex = [0]
 
     def pushOperandType(self, operand, opType):
         if len(errorList) == 0:
@@ -184,19 +184,19 @@ class Quadruples:
         if len(errorList) == 0:
             self.createQuadruple(self.quadCodes['era'], None, None, funcSize)
             # Initialize param pointer to 0 and save current function signature
-            self.sigIndex = 0
-            self.currentSignature = funcSig
+            self.sigIndex.append(0)
+            self.currentSignature.append(funcSig)
 
     def createParam(self):
         if len(errorList) == 0:
-            if self.sigIndex < len(self.currentSignature):
+            if self.sigIndex[-1] < len(self.currentSignature[-1]):
                 arg = self.operandStack.pop()
                 argType = self.typeStack.pop()
-                currentParam = self.currentSignature[self.sigIndex]
+                currentParam = self.currentSignature[-1][self.sigIndex[-1]]
                 if argType == currentParam[0]:
                     self.createQuadruple(self.quadCodes['param'], arg, None, currentParam[1])
                 else:
-                    errorList.append(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex][0]}")
+                    errorList.append(f"Type Mismatch in function call: {argType} and {self.currentSignature[-1][self.sigIndex[-1]][0]}")
                     #print(f"Type Mismatch in function call: {argType} and {self.currentSignature[self.sigIndex][0]}")
                 
             # else:
@@ -204,33 +204,51 @@ class Quadruples:
             #     print("Too many parameters")
 
             # We increment the counter to receive the next or compare with function signature at the end
-            self.sigIndex += 1
+            self.sigIndex[-1] += 1
 
     def createGoSub(self, quadNum):
         if len(errorList) == 0:
             # Verify that the signature's index is the correct length
-            if self.sigIndex == len(self.currentSignature):
+            if self.sigIndex[-1] == len(self.currentSignature[-1]):
                 self.createQuadruple(self.quadCodes['goSub'], None, None, quadNum)
-            elif self.sigIndex < len(self.currentSignature):
+            elif self.sigIndex[-1] < len(self.currentSignature[-1]):
                 errorList.append('Too little arguments')
             else:
                 errorList.append('Too many arguments')
+
+            self.currentSignature.pop()
+            self.sigIndex.pop()
     
     def createEndProgram(self):
         if len(errorList) == 0:
             self.createQuadruple(self.quadCodes['ep'], None, None, None)
     
-    def createReturn(self):
+    def createReturn(self, returnRecord):
         if len(errorList) == 0:
-            returnAddress = self.operandStack.pop()
-            returnType = self.typeStack.pop()
+            # First remove the global return address and the result temp
+            returnAddress = returnRecord['address']
+            returnType = returnRecord['type']
             result = self.operandStack.pop()
             resultType = self.typeStack.pop()
-            print(resultType)
-            print(returnType)
-            print(resultType == returnType)
             self.createQuadruple(self.quadCodes['return'], result, None, returnAddress)
+            # Then return the global address which received the result to the stack
+            # This address will be assigned to a temporal address created on function call
+            # self.pushOperandType(returnAddress, returnType)
 
+    def createReturnAssignment(self, returnRecord):
+        if len(errorList) == 0:
+            print(self.operandStack)
+            # First remove the return address from the stack
+            returnAddress = returnRecord['address']
+            returnType = returnRecord['type']
+            # Then create a new temporal space to assign the address to
+            result = self.avail.nextAvail(returnType)
+            resultType = returnType
+            # Now add the returns global address to the temporal address
+            self.createQuadruple('=', returnAddress, None, result)
+            # Finally return the temporal address to the stack
+            self.pushOperandType(result, resultType)
+            print(self.operandStack)
 
     def __str__(self):
         if len(errorList) == 0:
