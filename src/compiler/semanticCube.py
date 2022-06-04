@@ -116,7 +116,7 @@ def semantics(left_type, right_type, operator):
                 return rightDictionary[operator]
             else:
                 print(f"Invalid operator type: \"{operator}\"")
-                errorList.append(f"Invalid operator type: \"{right_type}\"")
+                errorList.append(f"Invalid operator type: \"{operator}\"")
         else:
             print(f"Invalid right operand type: \"{right_type}\"")
             errorList.append(f"Invalid right operand type: \"{right_type}\"")
