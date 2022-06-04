@@ -143,10 +143,10 @@ class StartlightParser(Parser):
 
     @_('')
     def np_set_ms(self, p):
-        if len(errorList) == 0:
-            record.setCurrentRecord(symMngr.searchAtomic(p[-8]))
-            
-            record.clearCurrentRecord()
+        
+        record.setCurrentRecord(symMngr.searchAtomic(p[-8]))
+        record.calcDimMs()
+        record.clearCurrentRecord()
 
     @_('')
     def np_class_id(self, p):
