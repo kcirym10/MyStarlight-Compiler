@@ -555,6 +555,7 @@ class StartlightParser(Parser):
     @_('')
     def np_push_var_operand(self, p):
         if symMngr.canPushOrPop:
+            # Only classes require special searching
             if p[-2] == None:
                 # If the variable is declared then we can add it
                 operand = p[-3]
