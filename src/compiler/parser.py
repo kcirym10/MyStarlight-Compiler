@@ -1,6 +1,7 @@
 from distutils.log import error
 import os.path
 import copy
+import sys
 
 from sly import Parser
 from compiler.lexer import StartlightLexer
@@ -718,6 +719,17 @@ class StartlightParser(Parser):
     @_('')
     def eps(self, p):
         pass
+
+    def error(self, p):
+        if p:
+            if len(errorList) > 0:
+                for err in errorList:
+                    print(err)
+            print("Syntax error in token {", p.type, ", line:", p.lineno, "}")
+            print("Exited with code 0")
+        else:
+            print("Syntax error at EOF")
+        sys.exit()
 
 def parseProgram(fileName):
     lexer = StartlightLexer()
