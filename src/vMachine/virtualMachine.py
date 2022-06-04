@@ -121,8 +121,12 @@ class virtualMachine:
     # This function runs all the instructions that are in the
     # quadrple list.
     def runInstructions(self):
+        runTimeError = ""
         ip = 0
         while (self.quadList[ip][0] != "ENDPROGRAM"):
+            if runTimeError != "":
+                print(runTimeError)
+                return
             #print(self.memUsage)
             quad = self.quadList[ip]
             #print(quad)
@@ -152,8 +156,7 @@ class virtualMachine:
                         segSize[index] += int(item)
 
                 if self.memUsage + segSize[0] + segSize[1] > self.memLimit:
-                    print("Stack Overflow")
-                    return
+                    runTimeError = "Stack Overflow"
                 
                 # Create a temporarily parallel memory context before changing to it
                 self.tempContext = [memory("LS", segSize[0]), memory("TS", segSize[1])]
@@ -308,7 +311,7 @@ class virtualMachine:
                     self.memSeg(a3).setValue(a3, res)
                     self.memUsage += 1
                 else:
-                    print("ERROR division by 0 not supported")
+                    runTimeError = "ERROR division by 0 not supported"
             ip += 1
 
 
