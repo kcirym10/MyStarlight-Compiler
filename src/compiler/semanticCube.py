@@ -55,7 +55,6 @@ class semanticCube:
                 OperatorType.SUB: AtomicType.FLOAT,
                 OperatorType.MUL: AtomicType.FLOAT,
                 OperatorType.DIV: AtomicType.FLOAT,
-                OperatorType.ASSIGN: AtomicType.FLOAT,
                 OperatorType.GREATER: AtomicType.BOOL,
                 OperatorType.SMALLER: AtomicType.BOOL,
                 OperatorType.GREATER_EQUAL: AtomicType.BOOL,
