@@ -85,7 +85,8 @@ class StartlightParser(Parser):
     def np_exit_scope(self, p):
         vMem.resetLocal()
         quads.resetAvail()
-        symMngr.popRecord()
+        if symMngr.canPushOrPop:
+            symMngr.popRecord()
 
     @_('simple ";" more_var_types', 'compound ";" more_var_types')
     def var_type(self, p):
@@ -127,27 +128,29 @@ class StartlightParser(Parser):
 
     @_('')
     def np_set_dims(self, p):
-        record.setCurrentRecord(symMngr.searchAtomic(p[-3]))
-        record.setDimList()
-        record.clearCurrentRecord()
+        if symMngr.canPushOrPop:
+            record.setCurrentRecord(symMngr.searchAtomic(p[-3]))
+            record.setDimList()
+            record.clearCurrentRecord()
 
     @_('')
     def np_set_dim_limit(self, p):
-        if not int(p[-1]) > 0:
-            errorList.append("Error: array index must be greater than 0")
+        if symMngr.canPushOrPop:
+            if not int(p[-1]) > 0:
+                errorList.append("Error: array index must be greater than 0")
 
-        record.setCurrentRecord(symMngr.searchAtomic(p[-5]))
-        record.setDimLim(p[-1])
-        offset = int(p[-1]) -1 
-        vMem.offsetByDimension(record.currentRecord['type'], offset)
-        record.clearCurrentRecord()
+            record.setCurrentRecord(symMngr.searchAtomic(p[-5]))
+            record.setDimLim(p[-1])
+            offset = int(p[-1]) -1 
+            vMem.offsetByDimension(record.currentRecord['type'], offset)
+            record.clearCurrentRecord()
 
     @_('')
     def np_set_ms(self, p):
-        
-        record.setCurrentRecord(symMngr.searchAtomic(p[-8]))
-        record.calcDimMs()
-        record.clearCurrentRecord()
+        if symMngr.canPushOrPop:
+            record.setCurrentRecord(symMngr.searchAtomic(p[-8]))
+            record.calcDimMs()
+            record.clearCurrentRecord()
 
     @_('')
     def np_class_id(self, p):
@@ -165,23 +168,25 @@ class StartlightParser(Parser):
 
     @_('')
     def np_inc_dim_count(self, p):
-        record.setCurrentRecord(symMngr.getKeyRecord(p[-7]))
-        record.incDimCount()
-        record.clearCurrentRecord()
+        if symMngr.canPushOrPop:
+            record.setCurrentRecord(symMngr.getKeyRecord(p[-7]))
+            record.incDimCount()
+            record.clearCurrentRecord()
 
     @_('')
     def np_set_dim_limit_2(self, p):
-        if not int(p[-1]) > 0:
-            errorList.append("Error: array index must be greater than 0")
+        if symMngr.canPushOrPop:
+            if not int(p[-1]) > 0:
+                errorList.append("Error: array index must be greater than 0")
 
-        record.setCurrentRecord(symMngr.searchAtomic(p[-9]))
-        record.setDimLim(p[-1])
-        # Remove the previous offset and update with new dims
-        remOffset = -int(p[-5])
-        vMem.offsetByDimension(record.currentRecord['type'], remOffset)
-        offset = int(p[-1]) * int(p[-5]) - 1
-        vMem.offsetByDimension(record.currentRecord['type'], offset)
-        record.clearCurrentRecord()
+            record.setCurrentRecord(symMngr.searchAtomic(p[-9]))
+            record.setDimLim(p[-1])
+            # Remove the previous offset and update with new dims
+            remOffset = -int(p[-5])
+            vMem.offsetByDimension(record.currentRecord['type'], remOffset)
+            offset = int(p[-1]) * int(p[-5]) - 1
+            vMem.offsetByDimension(record.currentRecord['type'], offset)
+            record.clearCurrentRecord()
 
     # Classes
     @_('CLASS np_prepare_class CLASS_ID np_save_func_id opt_derivation "{" opt_vars opt_methods "}" np_exit_scope classes', 'eps')
@@ -190,7 +195,8 @@ class StartlightParser(Parser):
 
     @_('')
     def np_prepare_class(self, p):
-        symMngr.setCurrentType(record.getClassType())
+        if symMngr.canPushOrPop:
+            symMngr.setCurrentType(record.getClassType())
 
     @_('DERIVES CLASS_ID np_copy_class_record', 'eps')
     def opt_derivation(self, p):
@@ -371,11 +377,13 @@ class StartlightParser(Parser):
 
     @_('')
     def np_if(self, p): # Implement if NP 1
-        quads.createGotoF()
+        if symMngr.canPushOrPop:
+            quads.createGotoF()
 
     @_('')
     def np_end_if(self, p):
-        quads.fillGotos()
+        if symMngr.canPushOrPop:
+            quads.fillGotos()
 
     @_('ELSE np_else "{" body "}"', 'eps')
     def opt_else(self, p):
@@ -383,7 +391,8 @@ class StartlightParser(Parser):
     
     @_('')
     def np_else(self, p):
-        quads.createGoto()
+        if symMngr.canPushOrPop:
+            quads.createGoto()
 
     # Cycles Statement
     @_('for_loop', 'while_loop')
@@ -435,7 +444,11 @@ class StartlightParser(Parser):
             if p[-1] is None:
                 if not symMngr.isFuncDeclared(p[-2]):
                     errorList.append(f"Undefined function call id: {p[-2]}")
-                    print(f"Undefined function call id: {p[-2]}")
+                    # print(f"Undefined function call id: {p[-2]}")
+                # elif symMngr.searchAtomic(p[-2])['type'] == 'void':
+                #     errorList.append(f"Invalid call of void function in expression. Function id: {p[-2]}")
+                    #print(f"Invalid call of void function in expression. Function id: {p[-2]}")
+                # Allows for continued parsing without breaking stack checks
                 else:
                     quads.operatorStack.append('(')
             #     print("FUNCTION CALL ", p[-2])
@@ -533,7 +546,7 @@ class StartlightParser(Parser):
                 errorList.append("Return in void function detected")
 
     # Variable
-    @_('ID  opt_class_func opt_arr_call np_push_var_operand')
+    @_('ID opt_class_func opt_arr_call np_push_var_operand')
     def variable(self, p):
         pass
 
@@ -542,7 +555,7 @@ class StartlightParser(Parser):
     @_('')
     def np_push_var_operand(self, p):
         if symMngr.canPushOrPop:
-            if p[-2] == None and p[-1] == None:
+            if p[-2] == None:
                 # If the variable is declared then we can add it
                 operand = p[-3]
                 record = symMngr.searchAtomic(operand)
@@ -554,9 +567,20 @@ class StartlightParser(Parser):
                     print(f"Key: \"{p[-3]}\" is not defined")
                     errorList.append(f"Key: \"{p[-3]}\" is not defined")
 
-    @_(' "[" expression opt_dim_call "]"', 'eps')
+    @_(' "[" np_check_array expression opt_dim_call "]"', 'eps')
     def opt_arr_call(self, p):
-        pass
+        if symMngr.canPushOrPop:
+            if p[0] == '[':
+                print("ARRAY CALL")
+                return 1
+
+    # If the variable is an array then we process everything
+    @_('')
+    def np_check_array(self, p):
+                print(symMngr.searchAtomic(p[-3]))
+                if symMngr.isArray(p[-3]):
+                    record = symMngr.searchAtomic(p[-3])
+                    print("IS ARRAY")
 
     @_(' "," expression', 'eps')
     def opt_dim_call(self, p):
