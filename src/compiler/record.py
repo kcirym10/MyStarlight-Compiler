@@ -31,8 +31,48 @@ class Record:
     def getChildRef(self):
         return self.currentRecord['childRef']
 
+    # Arrays and matrixes
+    # Creates the Dim reference to a list of lists formed by dimension limit and m(n)
+    def setDimList(self):
+        self.currentDim = 0
+        self.dimR = 1
+        self.currentRecord['dims'] = [[]]
+    
+    def setDimLim(self, dimLim):
+        # Creates a new node
+        if self.currentDim > 0:
+            self.currentRecord['dims'].append([])
+
+        # Appends the upper limit to the node and calculates the new R
+        self.currentRecord['dims'][self.currentDim].append(dimLim)
+        self.dimR = (dimLim + 1) * self.dimR
+    
+    def incDimCount(self):
+        self.currentDim += 1
+
+    def calcDimMs(self):
+        # print(self.currentDim)
+        # print(self.currentRecord['dims'])
+        # Calculate and store m for each dimension
+        for dim in self.currentRecord['dims']:
+            # Sets to 1 and keeps compiling searching for new errors
+            if (dim[0] == 0):
+                dim[0] = 1
+            mDim = self.dimR / (dim[0])
+            dim.append(mDim)
+            self.dimR = mDim
+
+        # print(print(self.currentRecord['dims']))
+        # End of array reset dimension and r
+        self.currentDim = 0
+        self.dimR = 1
+
     def clearCurrentRecord(self):
         self.currentRecord = {}
+
+    # Used for arrays and matrices in order to update the current record
+    def setCurrentRecord(self, record):
+        self.currentRecord = record
 
     def returnRecord(self):
         return self.currentRecord
