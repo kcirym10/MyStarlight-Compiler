@@ -706,7 +706,6 @@ class StartlightParser(Parser):
     def end(self, p):
         if symMngr.canPushOrPop:
             quads.createEndProgram()
-            print(symMngr[-1])
     # Epsilon, describes an empty production
 
     @_('')
