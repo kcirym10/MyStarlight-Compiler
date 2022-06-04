@@ -124,6 +124,10 @@ class virtualMachine:
         runTimeError = ""
         ip = 0
         while (self.quadList[ip][0] != "ENDPROGRAM"):
+            # Check memory usage in case new variables were created and size not modified in recursive call
+            if self.memUsage > self.memLimit:
+                runTimeError = "Stack Overflow"
+            # Check and possibly throw execution error
             if runTimeError != "":
                 print(runTimeError)
                 return
