@@ -126,15 +126,20 @@ class StartlightParser(Parser):
 
     @_('')
     def np_set_dims(self, p):
-        record.setCurrentRecord(symMngr.getKeyRecord(p[-3]))
+        record.setCurrentRecord(symMngr.searchAtomic(p[-3]))
         record.setDimList()
         record.clearCurrentRecord()
 
     @_('')
     def np_set_dim_limit(self, p):
-        record.setCurrentRecord(symMngr.getKeyRecord(p[-5]))
-        record.setDimLim(p[-1])
-        record.clearCurrentRecord()
+        if int(p[-1]) > 0:
+            record.setCurrentRecord(symMngr.searchAtomic(p[-5]))
+            record.setDimLim(p[-1])
+            offset = int(p[-1]) -1 
+            vMem.offsetByDimension(record.currentRecord['type'], offset)
+            record.clearCurrentRecord()
+        else:
+            errorList.append("Error: array index must be greater than 0")
 
     @_('')
     def np_class_id(self, p):
@@ -142,13 +147,33 @@ class StartlightParser(Parser):
             # TODO Check if class_id defined in semantic cube
             symMngr.setCurrentType(p[-1])
 
-    @_('"," ID np_save_id "[" CTE_INT two_dim "]" more_arr_ids', 'eps')
+    @_('"," ID np_save_id "[" np_set_dims CTE_INT np_set_dim_limit two_dim "]" more_arr_ids', 'eps')
     def more_arr_ids(self, p):
         pass
 
-    @_('"," CTE_INT', 'eps')
+    @_('"," np_inc_dim_count CTE_INT np_set_dim_limit_2', 'eps')
     def two_dim(self, p):
         pass
+
+    @_('')
+    def np_inc_dim_count(self, p):
+        record.setCurrentRecord(symMngr.getKeyRecord(p[-7]))
+        record.incDimCount()
+        record.clearCurrentRecord()
+
+    @_('')
+    def np_set_dim_limit_2(self, p):
+        if int(p[-1]) > 0:
+            record.setCurrentRecord(symMngr.searchAtomic(p[-9]))
+            record.setDimLim(p[-1])
+            # Remove the previous offset and update with new dims
+            remOffset = -int(p[-5])
+            vMem.offsetByDimension(record.currentRecord['type'], remOffset)
+            offset = int(p[-1]) * int(p[-5]) - 1
+            vMem.offsetByDimension(record.currentRecord['type'], offset)
+            record.clearCurrentRecord()
+        else:
+            errorList.append(f"Error: array index must be greater than 0")
 
     # Classes
     @_('CLASS np_prepare_class CLASS_ID np_save_func_id opt_derivation "{" opt_vars opt_methods "}" np_exit_scope classes', 'eps')
@@ -681,6 +706,7 @@ class StartlightParser(Parser):
     def end(self, p):
         if symMngr.canPushOrPop:
             quads.createEndProgram()
+            print(symMngr[-1])
     # Epsilon, describes an empty production
 
     @_('')
