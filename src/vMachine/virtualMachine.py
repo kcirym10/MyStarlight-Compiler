@@ -15,6 +15,11 @@ class memory:
             #print(key," ",keyList.index(key))
             startRange = self.memType[key]
             if int(address) >= startRange and int(address) < startRange + 2000:
+                if int(address) not in self.memory[keyList.index(key)]:
+                    if key == 'char':
+                        self.memory[keyList.index(key)][int(address)] = str(0)
+                    else:
+                        self.memory[keyList.index(key)][int(address)] = 0
                 return self.memory[keyList.index(key)]
 
     def getValue(self, address):
