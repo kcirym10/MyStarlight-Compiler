@@ -45,7 +45,7 @@ class Record:
 
         # Appends the upper limit to the node and calculates the new R
         self.currentRecord['dims'][self.currentDim].append(dimLim)
-        self.dimR = (dimLim + 1) * self.dimR
+        self.dimR = (dimLim) * self.dimR
     
     def incDimCount(self):
         self.currentDim += 1
