@@ -24,7 +24,8 @@ class Quadruples:
         'param' : 'PARAM',
         'goSub' : 'GOSUB',
         'ep' : 'ENDPROGRAM',
-        'return' : 'RETURN'
+        'return' : 'RETURN',
+        'ver' : 'VERIFY'
     }
 
     def resetAvail(self):
@@ -38,6 +39,8 @@ class Quadruples:
     typeStack = deque()
     # Jump Stack
     jumpStack = deque()
+    # Dimension Stack
+    dimStack = deque()
 
     # cube = semanticCube()  # Should we create the object here (?)
     quadList = []
@@ -253,6 +256,28 @@ class Quadruples:
             # Finally return the temporal address to the stack
             self.pushOperandType(result, resultType)
             print(self.operandStack)
+
+    # Arrays
+    def pushDim(self, dim):
+        if len(errorList) == 0:
+            self.dimStack.append(dim)
+
+    def createVerify(self, dimNum = 0):
+        if len(errorList) == 0:
+            # Create verify quadruple
+            self.createQuadruple(self.quadCodes['ver'], self.operandStack[-1], 0, self.dimStack[-1][0])
+
+            aux = self.operandStack.pop()
+            temp = self.avail.nextAvail('int')
+            self.createQuadruple('*', aux, self.dimStack[-1][1], temp)
+            self.operandStack.append(temp)
+
+            if dimNum > 0:
+                aux2 = self.operandStack.pop()
+                aux1 = self.operandStack.pop()
+                temp = self.avail.nextAvail('int')
+                self.createQuadruple('+', aux1, aux2, temp)
+                self.operandStack.append(temp)
 
     def __str__(self):
         if len(errorList) == 0:
