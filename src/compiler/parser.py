@@ -555,8 +555,8 @@ class StartlightParser(Parser):
     @_('')
     def np_push_var_operand(self, p):
         if symMngr.canPushOrPop:
-            # Only classes require special searching
-            if p[-2] == None:
+            # Arrays and classes are processed differently from normal variables
+            if p[-2] == None and p[-1] == None:
                 # If the variable is declared then we can add it
                 operand = p[-3]
                 record = symMngr.searchAtomic(operand)
@@ -568,20 +568,30 @@ class StartlightParser(Parser):
                     print(f"Key: \"{p[-3]}\" is not defined")
                     errorList.append(f"Key: \"{p[-3]}\" is not defined")
 
-    @_(' "[" np_check_array expression opt_dim_call "]"', 'eps')
+    @_(' "[" np_check_array expression np_create_verify opt_dim_call "]"', 'eps')
     def opt_arr_call(self, p):
         if symMngr.canPushOrPop:
             if p[0] == '[':
-                print("ARRAY CALL")
                 return 1
 
-    # If the variable is an array then we process everything
+    # If the variable is an array then we add the dimension to the dimStack
     @_('')
     def np_check_array(self, p):
                 print(symMngr.searchAtomic(p[-3]))
+                # Check if ID is an array otherwise 
                 if symMngr.isArray(p[-3]):
                     record = symMngr.searchAtomic(p[-3])
-                    print("IS ARRAY")
+                    # Append first dimension
+                    quads.pushDim(record['dims'][0])
+                    # Add fake bottom
+                    quads.operatorStack.append('(')
+                else:
+                    errorList.append(f'Error, can not index non array variable {p[-3]}')
+
+    # We create the verifiation quadruple for and arrays dimension
+    @_('')
+    def np_create_verify(self, p):
+        pass
 
     @_(' "," expression', 'eps')
     def opt_dim_call(self, p):
