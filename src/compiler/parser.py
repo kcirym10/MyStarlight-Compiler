@@ -150,6 +150,10 @@ class StartlightParser(Parser):
         if symMngr.canPushOrPop:
             record.setCurrentRecord(symMngr.searchAtomic(p[-8]))
             record.calcDimMs()
+            # Interchange constants value to its memory address
+            for dim in record.currentRecord['dims']:
+                dim[0] = symMngr.constSetAndGet(dim[0], vMemRef=vMem, recordRef=record)
+                dim[1] = symMngr.constSetAndGet(dim[1], vMemRef=vMem, recordRef=record)
             record.clearCurrentRecord()
 
     @_('')
@@ -561,8 +565,6 @@ class StartlightParser(Parser):
                 operand = p[-3]
                 record = symMngr.searchAtomic(operand)
                 if record:
-                    #print(operand, ' ', record['address'])
-                    #quads.pushOperandType(operand, record['type'])
                     quads.pushOperandType(record["address"], record['type'])
                 else:
                     print(f"Key: \"{p[-3]}\" is not defined")
