@@ -95,14 +95,14 @@ class symTableManager(List):
             self[0].saveRecord('CTE', recordRef.returnRecord())
             recordRef.clearCurrentRecord()
         
-        searchRes = self.searchAtomic(str(const))
+        searchRes = str(const) in self[0]['CTE']['childRef']
         # Gets the data type from the constant token
         cteType = str(type(const).__name__)
-        if searchRes == None:
+        if searchRes == False:
             memAddress = vMemRef.nextConstant(cteType)
             self[0]['CTE']['childRef'][str(const)] = memAddress
         else:
-            memAddress = searchRes
+            memAddress = self[0]['CTE']['childRef'][str(const)]
 
         return memAddress
 
