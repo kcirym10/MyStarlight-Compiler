@@ -58,7 +58,7 @@ class Record:
             # Sets to 1 and keeps compiling searching for new errors
             if (dim[0] == 0):
                 dim[0] = 1
-            mDim = self.dimR / (dim[0])
+            mDim = int(self.dimR / (dim[0]))
             dim.append(mDim)
             self.dimR = mDim
 
