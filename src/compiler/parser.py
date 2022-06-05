@@ -577,7 +577,7 @@ class StartlightParser(Parser):
     # If the variable is an array then we add the dimension to the dimStack
     @_('')
     def np_check_array(self, p):
-                print(symMngr.searchAtomic(p[-3]))
+            if symMngr.canPushOrPop:
                 # Check if ID is an array otherwise 
                 if symMngr.isArray(p[-3]):
                     record = symMngr.searchAtomic(p[-3])
@@ -591,7 +591,8 @@ class StartlightParser(Parser):
     # We create the verifiation quadruple for and arrays dimension
     @_('')
     def np_create_verify(self, p):
-        pass
+        if symMngr.canPushOrPop:
+            quads.createVerify()
 
     @_(' "," expression', 'eps')
     def opt_dim_call(self, p):
