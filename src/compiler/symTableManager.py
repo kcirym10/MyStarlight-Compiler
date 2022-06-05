@@ -87,6 +87,25 @@ class symTableManager(List):
     def getKeyRecord(self, key):
         self[-1].searchKey(key)
 
+    def constSetAndGet(self, const, vMemRef, recordRef):
+        # Creates the constants table if it does not exist and saves the constant
+        if 'CTE' not in self[0]:
+            recordRef.setType('cte')
+            recordRef.setChildRef(self.getNewSymTable())
+            self[0].saveRecord('CTE', recordRef.returnRecord())
+            recordRef.clearCurrentRecord()
+        
+        searchRes = self.searchAtomic(str(const))
+        # Gets the data type from the constant token
+        cteType = str(type(const).__name__)
+        if searchRes == None:
+            memAddress = vMemRef.nextConstant(cteType)
+            self[0]['CTE']['childRef'][str(const)] = memAddress
+        else:
+            memAddress = searchRes
+
+        return memAddress
+
 if __name__ == "__main__":
     symMngr = symTableManager()
     key = "Program"
