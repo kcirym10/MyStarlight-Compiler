@@ -1,7 +1,7 @@
-program binarySearch;
+program binarySearchy;
 
 var
-    int arr[100];
+    float arr[100];
 
 func int binarySearch(int li, int ls, int val)
 var int mid;
