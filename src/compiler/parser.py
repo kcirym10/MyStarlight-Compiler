@@ -142,7 +142,8 @@ class StartlightParser(Parser):
             record.setCurrentRecord(symMngr.searchAtomic(p[-5]))
             record.setDimLim(p[-1])
             offset = int(p[-1]) -1 
-            vMem.offsetByDimension(record.currentRecord['type'], offset)
+            #print("ADDRESS ", record.currentRecord['address'])
+            vMem.offsetByDimension(record.currentRecord['address'], record.currentRecord['type'], offset)
             record.clearCurrentRecord()
 
     @_('')
@@ -187,9 +188,9 @@ class StartlightParser(Parser):
             record.setDimLim(p[-1])
             # Remove the previous offset and update with new dims
             remOffset = -int(p[-5])
-            vMem.offsetByDimension(record.currentRecord['type'], remOffset)
-            offset = int(p[-1]) * int(p[-5]) - 1
-            vMem.offsetByDimension(record.currentRecord['type'], offset)
+            vMem.offsetByDimension(record.currentRecord['address'],record.currentRecord['type'], remOffset)
+            offset = int(p[-1]) * int(p[-5])
+            vMem.offsetByDimension(record.currentRecord['address'],record.currentRecord['type'], offset)
             record.clearCurrentRecord()
 
     # Classes
@@ -486,9 +487,9 @@ class StartlightParser(Parser):
                             returnRecord = symMngr[0]['returns']['childRef'][p[-7]]
                             quads.createReturnAssignment(returnRecord)
                             
-                    elif symMngr.searchAtomic(p[-7])['type'] == 'void':
-                        errorList.append("Missing return in non-void function")
-                        return
+                        elif symMngr.searchAtomic(p[-7])['type'] == 'void':
+                            errorList.append("Missing return in non-void function")
+                            return
             # else, search the function in classes
                     
 
@@ -582,6 +583,7 @@ class StartlightParser(Parser):
     @_(' "[" np_check_array expression np_create_verify opt_dim_call "]" np_arr_call_end', 'eps')
     def opt_arr_call(self, p):
         if symMngr.canPushOrPop:
+            #print('opr arr calls can pushorpop', quads.operatorStack)
             if p[0] == '[':
                 return 1
 
