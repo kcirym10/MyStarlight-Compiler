@@ -39,8 +39,6 @@ class Quadruples:
     typeStack = deque()
     # Jump Stack
     jumpStack = deque()
-    # Dimension Stack
-    dimStack = deque()
 
     # cube = semanticCube()  # Should we create the object here (?)
     quadList = []
@@ -50,6 +48,10 @@ class Quadruples:
     # Param Pointer
     currentSignature = []
     sigIndex = [0]
+    # Dimension Stack
+    dimStack = []
+    dimIndex = []
+    arrAddressStack = []
 
     def pushOperandType(self, operand, opType):
         if len(errorList) == 0:
@@ -77,16 +79,20 @@ class Quadruples:
                 self.operatorStack.append(oper)
                 # print("In create")
                 if(oper in operator):
+                            
+                    print("Operand Stack", self.operandStack)
+                    print("Type Stack", self.typeStack)
                     # print(oper)
+                    # print(self.operatorStack)
                     oper = self.operatorStack.pop()
                     # self.operatorStack.append(oper)
                     #print("Operator: ", oper)
                     right_operand = self.operandStack.pop()  # right operand
-                    if len(self.operandStack) >= 1:
-                        left_operand = self.operandStack.pop()  # left operand
-                    else:
-                        errorList.append("Expression error, posible assignment of void function")
-                        return
+                    # if len(self.operandStack) >= 1:
+                    left_operand = self.operandStack.pop()  # left operand
+                    # else:
+                    #     errorList.append("Expression error, posible assignment of void function")
+                    #     return
                     right_type = self.typeStack.pop()
                     left_type = self.typeStack.pop()
 
@@ -107,7 +113,6 @@ class Quadruples:
                             self.operandStack.append(temp)
                             self.typeStack.append(tempType)
                     else:
-                        print("Type Mismatch")
                         errorList.append("Type Mismatch")
     
     # Creates the quadruple for print and read
@@ -151,7 +156,6 @@ class Quadruples:
                 self.createQuadruple(self.quadCodes['goF'], result, None, None)
                 self.jumpStack.append(self.ip - 1)
             else:
-                print("ERROR: Expected bool result")
                 errorList.append("ERROR: Expected bool result")
 
     # Creates first goto quadruple and saves the quadNum to the jumpStack
@@ -233,6 +237,7 @@ class Quadruples:
     def createReturn(self, returnRecord):
         if len(errorList) == 0:
             # First remove the global return address and the result temp
+
             returnAddress = returnRecord['address']
             returnType = returnRecord['type']
             result = self.operandStack.pop()
@@ -243,41 +248,64 @@ class Quadruples:
             # self.pushOperandType(returnAddress, returnType)
 
     def createReturnAssignment(self, returnRecord):
-        if len(errorList) == 0:
-            print(self.operandStack)
-            # First remove the return address from the stack
-            returnAddress = returnRecord['address']
-            returnType = returnRecord['type']
-            # Then create a new temporal space to assign the address to
-            result = self.avail.nextAvail(returnType)
-            resultType = returnType
-            # Now add the returns global address to the temporal address
-            self.createQuadruple('=', returnAddress, None, result)
-            # Finally return the temporal address to the stack
-            self.pushOperandType(result, resultType)
-            print(self.operandStack)
+       
+            if len(errorList) == 0:
+                
+                # First remove the return address from the stack
+                returnAddress = returnRecord['address']
+                returnType = returnRecord['type']
+                # Then create a new temporal space to assign the address to
+                result = self.avail.nextAvail(returnType)
+                resultType = returnType
+                # Now add the returns global address to the temporal address
+                self.createQuadruple('=', returnAddress, None, result)
+                # Finally return the temporal address to the stack
+                self.pushOperandType(result, resultType)
 
     # Arrays
-    def pushDim(self, dim):
+    def pushDimAddress(self, dimList, address):
         if len(errorList) == 0:
-            self.dimStack.append(dim)
+            self.dimStack.append(dimList)
+            self.dimIndex.append(0)
+            self.arrAddressStack.append(address)
 
-    def createVerify(self, dimNum = 0):
+    def createVerify(self):
         if len(errorList) == 0:
-            # Create verify quadruple
-            self.createQuadruple(self.quadCodes['ver'], self.operandStack[-1], 0, self.dimStack[-1][0])
+            if self.typeStack[-1] == 'int':
+                self.typeStack.pop()
+                # Create verify quadruple
+                self.createQuadruple(self.quadCodes['ver'], self.operandStack[-1], None, self.dimStack[-1][self.dimIndex[-1]][0])
 
+                if self.dimIndex[-1] < len(self.dimStack[-1][self.dimIndex[-1]]) - 1:
+                    aux = self.operandStack.pop()
+                    temp = self.avail.nextAvail('int')
+                    self.createQuadruple('*', aux, self.dimStack[-1][self.dimIndex[-1]][1], temp)
+                    self.operandStack.append(temp)
+
+                if self.dimIndex[-1] > 0:
+                    aux2 = self.operandStack.pop()
+                    aux1 = self.operandStack.pop()
+                    temp = self.avail.nextAvail('int')
+                    self.createQuadruple('+', aux1, aux2, temp)
+                    self.operandStack.append(temp)
+            else:
+                print("ALGUN ERROR")
+
+    def incDimIndex(self):
+        if len(errorList) == 0:
+            self.dimIndex[-1] += 1
+
+    # Leaves the result address in the operand stack and removes the rest
+    # of the 
+    def createOffset(self):
+        if len(errorList) == 0:
             aux = self.operandStack.pop()
             temp = self.avail.nextAvail('int')
-            self.createQuadruple('*', aux, self.dimStack[-1][1], temp)
+            self.createQuadruple('++', aux, self.arrAddressStack[-1], temp)
             self.operandStack.append(temp)
-
-            if dimNum > 0:
-                aux2 = self.operandStack.pop()
-                aux1 = self.operandStack.pop()
-                temp = self.avail.nextAvail('int')
-                self.createQuadruple('+', aux1, aux2, temp)
-                self.operandStack.append(temp)
+            # Remove address, dimension and index for the current array
+            self.arrAddressStack.pop()
+            self.dimIndex.pop()
 
     def __str__(self):
         if len(errorList) == 0:
