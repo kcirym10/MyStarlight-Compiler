@@ -88,6 +88,12 @@ class symTableManager(List):
         self[-1].searchKey(key)
 
     def constSetAndGet(self, const, vMemRef, recordRef):
+        # If no global variable table
+        if not self[0].hasVarTable():
+            recordRef.setType("Var Table")
+            recordRef.setChildRef(self.getNewSymTable())
+            self[0].saveRecord('VARS', recordRef.returnRecord())
+            recordRef.clearCurrentRecord()
         # Creates the constants table if it does not exist and saves the constant
         if 'CTE' not in self[0]:
             recordRef.setType('cte')
@@ -100,6 +106,7 @@ class symTableManager(List):
         cteType = str(type(const).__name__)
         if searchRes == False:
             memAddress = vMemRef.nextConstant(cteType)
+            self[0]['VARS']['childRef'][str(const)] = memAddress
             self[0]['CTE']['childRef'][str(const)] = memAddress
         else:
             memAddress = self[0]['CTE']['childRef'][str(const)]
