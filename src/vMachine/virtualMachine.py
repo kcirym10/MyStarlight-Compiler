@@ -33,6 +33,7 @@ class memory:
 
     def setValue(self, address, val):
         if address >= 18000 and address < 20000:
+            
             pointerAddress = self.mapMemory(address)[address]
             if gM.mapMemory(pointerAddress) is not None:
                 gM.mapMemory(pointerAddress)[pointerAddress] = val
@@ -231,7 +232,10 @@ class virtualMachine:
                     temp = input()
                 
                 temp = self.checkUserInput(temp)
-                self.setReadInput(temp, a3)
+                if not(a3 >= 18000 and a3 < 20000):    
+                    self.setReadInput(temp, a3)
+                else:
+                    self.memSeg(a3).setValue(a3, temp)
                 self.memUsage += 1
             # Arrays and Matrixes
             # Verify that the parameter is inside the allowed limits
