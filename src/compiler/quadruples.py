@@ -289,7 +289,7 @@ class Quadruples:
                     self.createQuadruple('+', aux1, aux2, temp)
                     self.operandStack.append(temp)
             else:
-                print("ALGUN ERROR")
+                errorList.append("Indices must be of type \"int\"")
 
     def incDimIndex(self):
         if len(errorList) == 0:
