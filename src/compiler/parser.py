@@ -152,8 +152,8 @@ class StartlightParser(Parser):
             record.calcDimMs()
             # Interchange constants value to its memory address
             for dim in record.currentRecord['dims']:
-                dim[0] = symMngr.constSetAndGet(dim[0], vMemRef=vMem, recordRef=record)
-                dim[1] = symMngr.constSetAndGet(dim[1], vMemRef=vMem, recordRef=record)
+                dim[0] = symMngr.constSetAndGet(dim[0], vMemRef=vMem, recordRef=Record())
+                dim[1] = symMngr.constSetAndGet(dim[1], vMemRef=vMem, recordRef=Record())
             record.clearCurrentRecord()
 
     @_('')
@@ -479,14 +479,14 @@ class StartlightParser(Parser):
                     #print("AAAAAAAAAAAAAAAA")
                     quadNum = symMngr.searchAtomic(p[-7])['quadNum']
                     quads.createGoSub(quadNum)
-                    #print(symMngr)
+                    
                     if 'returns' in symMngr[0]:
                         #print(quads.quadList)
                         if symMngr.searchAtomic(p[-7])['type'] != 'void':
                             returnRecord = symMngr[0]['returns']['childRef'][p[-7]]
-                            print(returnRecord)
                             quads.createReturnAssignment(returnRecord)
-                    elif symMngr.searchAtomic(p[-7])['type'] != 'void':
+                            
+                    elif symMngr.searchAtomic(p[-7])['type'] == 'void':
                         errorList.append("Missing return in non-void function")
                         return
             # else, search the function in classes
@@ -505,8 +505,15 @@ class StartlightParser(Parser):
         pass
 
     # Return Statement
-    @_('RETURN "(" expression ")" ";"')
+    @_('RETURN np_return "(" expression ")" ";"')
     def function_return(self, p):
+        fName = symMngr[-1].parentName
+        globalVars = symMngr[0]['returns']['childRef']
+        returnRecord = globalVars[fName]
+        quads.createReturn(returnRecord)
+
+    @_('')
+    def np_return(self, p):
         if symMngr.canPushOrPop:
             if symMngr[-1].funcNeedsReturn:
                 #symMngr[-1].funcNeedsReturn = False
@@ -544,7 +551,9 @@ class StartlightParser(Parser):
                 #print(symMngr[0])
                 #quads.pushOperandType(returnRecord['address'], returnRecord['type'])
                 # Create return quadruple
-                quads.createReturn(returnRecord)
+                #print('return record ', returnRecord)
+                # quads.createReturn(returnRecord)
+                
                 
             else:
                 errorList.append("Return in void function detected")
@@ -570,7 +579,7 @@ class StartlightParser(Parser):
                     print(f"Key: \"{p[-3]}\" is not defined")
                     errorList.append(f"Key: \"{p[-3]}\" is not defined")
 
-    @_(' "[" np_check_array expression np_create_verify opt_dim_call "]"', 'eps')
+    @_(' "[" np_check_array expression np_create_verify opt_dim_call "]" np_arr_call_end', 'eps')
     def opt_arr_call(self, p):
         if symMngr.canPushOrPop:
             if p[0] == '[':
@@ -582,9 +591,11 @@ class StartlightParser(Parser):
             if symMngr.canPushOrPop:
                 # Check if ID is an array otherwise 
                 if symMngr.isArray(p[-3]):
-                    record = symMngr.searchAtomic(p[-3])
+                    currentRecord = symMngr.searchAtomic(p[-3])
+                    # Append Record type to typeStack
+                    quads.typeStack.append(currentRecord['type'])
                     # Append first dimension
-                    quads.pushDim(record['dims'][0])
+                    quads.pushDimAddress(currentRecord['dims'], currentRecord['address'])
                     # Add fake bottom
                     quads.operatorStack.append('(')
                 else:
@@ -596,9 +607,18 @@ class StartlightParser(Parser):
         if symMngr.canPushOrPop:
             quads.createVerify()
 
-    @_(' "," expression', 'eps')
+    @_('')
+    def np_arr_call_end(self, p):
+        quads.createOffset()
+        quads.operatorStack.pop()
+
+    @_(' "," np_inc_dim_index expression np_create_verify', 'eps')
     def opt_dim_call(self, p):
         pass
+
+    @_('')
+    def np_inc_dim_index(self, p):
+        quads.incDimIndex()
 
     # Expression (OR)
     @_('t_exp np_check_or_operator exp_or')
