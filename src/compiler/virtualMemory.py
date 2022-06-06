@@ -37,12 +37,13 @@ memoryArchitecture = {
     "TS" : { # Temporary Segment
         "int" : 12000,
         "float" : 14000,
-        "bool" : 16000
+        "bool" : 16000,
+        "pointer" : 18000
     },
     "CS" : { # Constant Segment
-        "int" : 18000,
-        "float" : 20000,
-        "char" : 22000
+        "int" : 20000,
+        "float" : 22000,
+        "char" : 24000
     }
 }
 
