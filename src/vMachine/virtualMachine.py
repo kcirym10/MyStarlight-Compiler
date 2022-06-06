@@ -25,6 +25,7 @@ class memory:
     def getValue(self, address):
         if address >= 18000 and address < 20000:
             pointerAddress = self.mapMemory(address)[address]
+            # print('pointer address in getVal ', pointerAddress)
             if gM.mapMemory(pointerAddress) is not None:
                 return gM.mapMemory(pointerAddress)[pointerAddress]
             else:
@@ -33,8 +34,8 @@ class memory:
 
     def setValue(self, address, val):
         if address >= 18000 and address < 20000:
-            
             pointerAddress = self.mapMemory(address)[address]
+            # print("Pointer Address ", pointerAddress)
             if gM.mapMemory(pointerAddress) is not None:
                 gM.mapMemory(pointerAddress)[pointerAddress] = val
             else:
@@ -149,8 +150,8 @@ class virtualMachine:
                 return
             #print(self.memUsage)
             quad = self.quadList[ip]
-            #print(quad)
-            #print(ip)
+            # print(quad)
+            # print(ip)
             quadCode = quad[0]
             # Special
             # GOTO's always require a continue at the end in order to keep the
