@@ -1,10 +1,11 @@
 from multiprocessing.sharedctypes import Value
+from re import A
 from compiler.helper import structsFromFile
 from compiler.virtualMemory import memoryArchitecture
 
 class memory:
     def __init__(self, memType, memSize = 0):
-        self.memory = [{}, {}, {}]
+        self.memory = [{}, {}, {}, {}]
         self.memType = memoryArchitecture[memType]
         self.memSize = memSize
 
@@ -12,7 +13,6 @@ class memory:
         keyList = list(self.memType.keys())
         #print(keyList)
         for key, value in self.memType.items():
-            #print(key," ",keyList.index(key))
             startRange = self.memType[key]
             if int(address) >= startRange and int(address) < startRange + 2000:
                 if int(address) not in self.memory[keyList.index(key)]:
@@ -23,15 +23,32 @@ class memory:
                 return self.memory[keyList.index(key)]
 
     def getValue(self, address):
-        #print(self.mapMemory(address))
+        if address >= 18000 and address < 20000:
+            pointerAddress = self.mapMemory(address)[address]
+            print("Pointer Address line 30",pointerAddress)
+            if gM.mapMemory(pointerAddress) is not None:
+                return gM.mapMemory(pointerAddress)[pointerAddress]
+            else:
+                return lM[-1].mapMemory(pointerAddress)[pointerAddress]
         return self.mapMemory(address)[address]
 
     def setValue(self, address, val):
+        if address >= 18000 and address < 20000:
+            pointerAddress = self.mapMemory(address)[address]
+            print("Pointer Address line 40",pointerAddress)
+            if gM.mapMemory(pointerAddress) is not None:
+                gM.mapMemory(pointerAddress)[pointerAddress] = val
+            else:
+                lM[-1].mapMemory(pointerAddress)[pointerAddress] = val
         self.mapMemory(address)[address] = val
         
 
         #print(self.memory)
 
+gM = memory("GS")
+lM = [memory("LS")]
+tM = [memory("TS")]
+cM = memory("CS")
 
 class virtualMachine:
     constants = None
@@ -40,10 +57,10 @@ class virtualMachine:
 
     # Declare memory structure as mem = []
     def __init__(self):
-        self._globalMemory = memory("GS")
-        self._localMemory = [memory("LS")]
-        self._tempMemory = [memory("TS")]
-        self._constantMemory = memory("CS")
+        self._globalMemory = gM
+        self._localMemory = lM
+        self._tempMemory = tM
+        self._constantMemory = cM
         self.memUsage = 0
         self.tempContext = None
         self._jumpStack = []
@@ -56,7 +73,7 @@ class virtualMachine:
             return self._globalMemory
         if address < 12000:
             return self._localMemory[-1]
-        if address < 18000:
+        if address < 20000:
             return self._tempMemory[-1]
         return self._constantMemory
 
@@ -219,6 +236,16 @@ class virtualMachine:
                 temp = self.checkUserInput(temp)
                 self.setReadInput(temp, a3)
                 self.memUsage += 1
+            # Arrays and Matrixes
+
+            # Must add the offset to the address and store the value
+            elif quadCode == "++":
+                a1 = int(quad[1])
+                a2 = int(quad[2])
+                a3 = int(quad[3])
+                # Add contents of a1 to address a2 (Offset address a2)
+                a2Offset = self.memSeg(a1).getValue(a1) + a2
+                self.memSeg(a3).setValue(a3, a2Offset)
             # Expressions
             elif quadCode == "=":
                 a1 = int(quad[1])
