@@ -300,7 +300,7 @@ class Quadruples:
     def createOffset(self):
         if len(errorList) == 0:
             aux = self.operandStack.pop()
-            temp = self.avail.nextAvail('int')
+            temp = self.avail.nextAvail('pointer')
             self.createQuadruple('++', aux, self.arrAddressStack[-1], temp)
             self.operandStack.append(temp)
             # Remove address, dimension and index for the current array
