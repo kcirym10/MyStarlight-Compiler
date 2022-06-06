@@ -797,8 +797,10 @@ def parseProgram(fileName):
     try:
 
         scriptpath = os.path.dirname(__file__)
-        filename = os.path.join(scriptpath, 'test.txt')
+        filename = os.path.join(scriptpath, fileName)
         f = open(filename)
+        if f == None:
+            print("NOOOOOO")
         # print(f.read())
 
         # f = open("test.txt", "r")  # inserta nombre de archivo
