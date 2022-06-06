@@ -25,7 +25,6 @@ class memory:
     def getValue(self, address):
         if address >= 18000 and address < 20000:
             pointerAddress = self.mapMemory(address)[address]
-            print("Pointer Address line 30",pointerAddress)
             if gM.mapMemory(pointerAddress) is not None:
                 return gM.mapMemory(pointerAddress)[pointerAddress]
             else:
@@ -35,7 +34,6 @@ class memory:
     def setValue(self, address, val):
         if address >= 18000 and address < 20000:
             pointerAddress = self.mapMemory(address)[address]
-            print("Pointer Address line 40",pointerAddress)
             if gM.mapMemory(pointerAddress) is not None:
                 gM.mapMemory(pointerAddress)[pointerAddress] = val
             else:
@@ -202,13 +200,13 @@ class virtualMachine:
                 a3 = int(quad[3])
                 self.memSeg(a3).setValue(a3, self.memSeg(a1).getValue(a1))
                 # Free memory from the previous context
-                self.memUsage -= self._localMemory[-1].memSize + self._tempMemory[-1].memSize
+                self.memUsage -= self._localMemory[-1].memSize - self._tempMemory[-1].memSize
                 # Remove the current context and return to the last ip
                 self.removeContext()
                 ip = self._jumpStack.pop()
             elif quadCode == "ENDFUNC":
                 # Free up memory space
-                self.memUsage -= self._localMemory[-1].memSize + self._tempMemory[-1].memSize
+                self.memUsage -= self._localMemory[-1].memSize - self._tempMemory[-1].memSize
                 # Remove the current context and return to the last ip
                 self.removeContext()
                 ip = self._jumpStack[-1]
@@ -224,7 +222,6 @@ class virtualMachine:
                     a3 = int(quad[3])
                 #print(self.memSeg(a1))
                     print(self.memSeg(a3).getValue(a3))
-                print('Memory usage ', self.memUsage)
             elif quadCode == "READ":
                 # must check for the expected type if not raise error
                 a3 = int(quad[3])
@@ -237,7 +234,18 @@ class virtualMachine:
                 self.setReadInput(temp, a3)
                 self.memUsage += 1
             # Arrays and Matrixes
-
+            # Verify that the parameter is inside the allowed limits
+            elif quadCode == "VERIFY":
+                a1 = int(quad[1])
+                a3 = int(quad[3])
+                val1 = self.memSeg(a1).getValue(a1)
+                if isinstance(val1, float):
+                    print("Indices must be of type \"int\"")
+                    return
+                limSup = self.memSeg(a3).getValue(a3)
+                if not(val1 >= 0 and val1 < limSup):
+                    print("Index out of bounds")
+                    return
             # Must add the offset to the address and store the value
             elif quadCode == "++":
                 a1 = int(quad[1])
@@ -339,6 +347,9 @@ class virtualMachine:
                 val2 = self.memSeg(a2).getValue(a2)
                 if val2 != 0:
                     res = val1 / val2
+                    intSeg = self.memSeg(a3).memType["int"]
+                    if a3 >= intSeg and a3 < intSeg + 2000:
+                        res = int(res)
                     self.memSeg(a3).setValue(a3, res)
                     self.memUsage += 1
                 else:
