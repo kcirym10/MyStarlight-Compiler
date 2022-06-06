@@ -79,9 +79,6 @@ class Quadruples:
                 self.operatorStack.append(oper)
                 # print("In create")
                 if(oper in operator):
-                            
-                    print("Operand Stack", self.operandStack)
-                    print("Type Stack", self.typeStack)
                     # print(oper)
                     # print(self.operatorStack)
                     oper = self.operatorStack.pop()
