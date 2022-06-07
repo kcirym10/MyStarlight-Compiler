@@ -1,0 +1,21 @@
+program factorial;
+
+func int recursiveFactorial(int n){
+    if(n > 1){
+        return(n * recursiveFactorial(n-1));
+    }
+    else{
+        return(1);
+    }
+}
+
+main()
+var
+    int numberUser;
+{
+    print("Enter a number to calculate the factorial");
+    read(numberUser);
+
+    print("Recursive version's result");
+    print(recursiveFactorial(numberUser));
+}

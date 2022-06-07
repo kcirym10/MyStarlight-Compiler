@@ -1,0 +1,21 @@
+program fibonacci;
+
+func int recursiveFib(int n, int second_last, int last){
+    if (n == 0){
+        return (second_last);
+    }
+    else{
+        
+        return(recursiveFib(n - 1, last, second_last + last));
+    }
+}
+
+main()
+var
+    int number;
+{
+    print("Enter number for fibonacci");
+    read(number);
+
+    print("Recursive Fibonacci's result", recursiveFib(number, 0, 1));
+}

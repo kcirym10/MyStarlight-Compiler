@@ -1,0 +1,34 @@
+program fibonacci;
+
+func int iterativeFib(int n)
+var
+    int first, second, last;
+{
+    first = 0;
+    second = 1;
+    if (n == first){
+        return(first);
+    }
+    if (n == second){
+        return(second);
+    }
+
+    while (n >= 2){
+        last = first + second;
+        first = second;
+        second = last;
+        n = n -1;
+    }
+
+    return(last);
+}
+
+main()
+var
+    int number;
+{
+    print("Enter number for fibonacci");
+    read(number);
+
+    print("Iterative Fibonacci's result", iterativeFib(number));
+}
